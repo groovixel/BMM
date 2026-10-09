@@ -1174,6 +1174,10 @@ a.svc-cat-card{color:inherit;text-decoration:none}
 }
 .experience-hero .np-btn--paper::after { display: none; }
 .experience-hero .np-btn--paper:hover { background: #ffffff; color: var(--ink); transform: translateY(-2px); }
+@media(max-width:800px){
+  [data-testid="experience-book-cta"]{transform:scale(.9);transform-origin:left center}
+  [data-testid="experience-book-cta"]:hover{transform:scale(.9) translateY(-2px);transform-origin:left center}
+}
 
 /* Secondary — light liquid glass (catalogue pills + menu nav) */
 .filter-pill, .drawer-nav button, .drawer-nav a {
