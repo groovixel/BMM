@@ -422,7 +422,7 @@ function Header() {
         <button onClick={() => goHomeSection("network")} data-testid="nav-network-link">WHAT WE DO</button>
         <Link to="/projects" onClick={() => setMenuOpen(false)} data-testid="nav-work-link">PROJECTS</Link>
         <Link to="/catalogue" onClick={() => setMenuOpen(false)} data-testid="nav-catalogue-link">CATALOGUE</Link>
-        <Link to="/experience" onClick={() => setMenuOpen(false)} data-testid="nav-experience-link">AIR BNB</Link>
+        <Link to="/stays" onClick={() => setMenuOpen(false)} data-testid="nav-experience-link">AIR BNB</Link>
         <Link to="/contact" onClick={() => setMenuOpen(false)} data-testid="nav-contact-link">CONTACT</Link>
       </nav>
       {(onStays || user === false) && <div className="drawer-account" data-testid="drawer-account">
