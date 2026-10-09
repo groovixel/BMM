@@ -816,7 +816,6 @@ function Footer() {
       </nav>
       <div className="site-footer__socials">
         <a href="https://www.instagram.com/bds.marvel" target="_blank" rel="noreferrer" aria-label="Instagram" data-testid="footer-instagram-link"><Instagram size={17} /></a>
-        <a href="https://www.linkedin.com/company/bdsm" target="_blank" rel="noreferrer" aria-label="LinkedIn" data-testid="footer-linkedin-link"><Linkedin size={17} /></a>
       </div>
     </div>
     <div className="site-footer__bottom"><span data-testid="footer-copyright">© BDSM · BDS Marvel {new Date().getFullYear()}</span><ScrollUpButton /></div>
