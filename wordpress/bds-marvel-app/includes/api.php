@@ -104,7 +104,7 @@ function bds_clean($input) {
     return $out;
 }
 function bds_stays() {
-    return json_decode(file_get_contents(BDSM_APP_DIR . 'includes/stays.json'), true) ?: array();
+    return array_map(function ($stay) { return array('slug'=>$stay['slug'], 'name'=>$stay['name'], 'guests'=>max(1,(int)($stay['guests']??1)), 'nightly'=>(int)preg_replace('/[^0-9]/','',$stay['price']??'0'), 'min_nights'=>max(1,(int)($stay['minNights']??1))); }, bds_content_rows('bds_stay'));
 }
 function bds_lock($slug) {
     global $wpdb;
@@ -143,7 +143,8 @@ function bds_notify($data, $subject, $guest = false) {
             $lines[] = ucwords(str_replace('_', ' ', $key)) . ': ' . $value;
         }
     }
-    $owner = get_option('bds_notification_email', get_option('admin_email'));
+    $form = !empty($data['form_slug']) ? bds_form_config($data['form_slug']) : null;
+    $owner = is_email($form['notification_email'] ?? '') ? $form['notification_email'] : get_option('bds_notification_email', get_option('admin_email'));
     wp_mail($owner, $subject, implode("\n", $lines), array('Reply-To: ' . sanitize_email($data['email'] ?? $owner)));
     if ($guest && is_email($data['email'] ?? '')) {
         $url = home_url('/#/stays/trips/' . $data['id']);
@@ -178,6 +179,7 @@ function bds_create_booking($request) {
     if (!in_array($mode, array('instant', 'request'), true)) { return bds_error('Invalid booking mode.'); }
     $user = bds_user();
     $nights = (int) $in->diff($out)->days;
+    if ($nights < ($stay['min_nights'] ?? 1)) { return bds_error('This stay requires at least ' . $stay['min_nights'] . ' nights.'); }
     if ($nights > 365) { return bds_error('Please contact the host for stays longer than one year.'); }
     $data = array_merge($data, array('id' => wp_generate_uuid4(), 'reference' => 'BDS-' . strtoupper(bin2hex(random_bytes(3))),
         'user_id' => $user ? (string) $user->ID : '0', 'stay' => $stay['name'], 'stay_slug' => $stay['slug'],
@@ -313,16 +315,15 @@ function bds_api($request) {
         if (strlen($request->get_body()) > 50000) { return bds_error('Please shorten the request.', 413); }
         $data = bds_clean($input);
         if (empty($data['name']) || !is_email($data['email'] ?? '')) { return bds_error('Enter your name and a valid email address.'); }
-        $required = array(
-            '/inquiries' => array('message' => 'Tell us about your project.'),
-            '/consultations' => array('phone' => 'Enter your phone number.', 'service' => 'Choose a consultation service.', 'requirements' => 'Tell us your consultation requirements.'),
-            '/sample-requests' => array('phone' => 'Enter your phone number.', 'product' => 'Choose a product.'),
-            '/product-inquiries' => array('message' => 'Tell us your product requirement.'),
-            '/quote-requests' => array('phone' => 'Enter your phone number.', 'product' => 'Choose a product.'),
-        );
-        foreach ($required[$path] as $field => $message) {
-            if (trim($data[$field] ?? '') === '') { return bds_error($message); }
+        $config=bds_form_config(ltrim($path,'/'));
+        if (!$config || empty($config['enabled'])) { return bds_error('This form is currently unavailable.',410); }
+        foreach($config['fields']??array() as $field) {
+            if(empty($field['enabled'])||empty($field['required'])){continue;}
+            if(($field['type']??'')==='file'){if(empty($data['file_id'])){return bds_error('Please attach the required file.');}continue;}
+            $key=sanitize_key($field['name']);
+            if(!isset($data[$key])||trim((string)$data[$key])===''||($field['type']==='checkbox'&&!$data[$key])){return bds_error('Please complete: '.sanitize_text_field($field['label']));}
         }
+        $data['form_slug'] = ltrim($path, '/');
         $data['id'] = wp_generate_uuid4(); $data['type'] = $types[$path]; $data['created_at'] = gmdate('c');
         if (!$wpdb->insert($wpdb->prefix . 'bds_enquiries', array('id' => $data['id'], 'type' => $data['type'], 'created_at' => current_time('mysql', true), 'data' => wp_json_encode($data)))) { return bds_error('Could not save your enquiry. Please try again.', 500); }
         bds_notify($data, 'BDS Marvel — ' . $data['type']);

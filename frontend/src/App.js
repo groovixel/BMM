@@ -1,3 +1,4 @@
+import { wordpressContent, DynamicFields, formSettings } from "./wordpress-content";
 import { apiFetch, apiPath, publicAsset } from "./wordpress";
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from "react";
 import { ArrowDown, ArrowUp, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight, Facebook, Instagram, Linkedin, Loader2, Search, Twitter, User, X, Youtube } from "lucide-react";
@@ -19,25 +20,25 @@ const scrollPositions = new Map();
 // Scroll position per pathname (for in-app "back" links that push a new entry)
 const scrollByPath = new Map();
 
-const segments = [
+const segments = wordpressContent("segments", [
   { slug: "interior-designing", name: "INTERIOR DESIGNING", parent: "BDS Marvel", kicker: "Concept to detail", tone: "sage", tagline: "Design that decides before the build begins.", body: "Concept, spatial planning, material palettes and detailing — resolved with our own stone, flooring and construction teams before a single wall is touched.", hero: "photo-1631679706909-1844bbd07221", services: ["Concept & Moodboards", "Space Planning", "Material Palettes", "3D Visualisation"], team: ["Principal designers", "Visualisation studio", "Procurement desk"] },
   { slug: "construction", name: "CONSTRUCTION", parent: "Formwork", kicker: "Turnkey execution", tone: "charcoal", tagline: "Buildings built the way the material wants to be used.", body: "Foundation, structure, finishes and site management for residential, hospitality and commercial builds — with a material-first sensibility.", hero: "photo-1503387762-592deb58ef4e", services: ["Civil Structure", "Finishing", "MEP Coordination", "Site Management"], team: ["Project directors", "Site engineers", "MEP consultants"] },
   { slug: "marble-and-stone", name: "MARBLE & STONE", parent: "Drawstones", kicker: "Interior stone", tone: "sand", tagline: "Stone that carries the building's silhouette.", body: "Facade and face stone for structures that need to age well. Interior stone — tables, fountains, decorative work — cut and finished in our own workshops.", hero: "photo-1618221195710-dd6b41faaea6", services: ["Facade Stone", "Face Stone", "Marble Slabs", "Decorative Stone"], team: ["Sourcing — Western India quarries", "Fabrication — Kishangarh workshop", "Installation — In-house crew"] },
   { slug: "flooring", name: "FLOORING", parent: "Renest", kicker: "Distribution + Proprietary", tone: "bronze", tagline: "Flooring, specified for how a space is actually lived in.", body: "Residential, hospitality and commercial projects — a distributed range and a proprietary line built for high-traffic floors.", hero: "photo-1616486338812-3dadae4b4ace", services: ["Wooden Plank", "Vinyl / SPC", "Stone Composite", "Sports & Contract"], team: ["Specification support", "Warehousing — Delhi NCR", "Installation partners"] },
   { slug: "furniture", name: "FURNITURE", parent: "Grain", kicker: "Bespoke & crafted", tone: "pink", tagline: "Furniture built the way architecture is.", body: "Tables, seating, storage and joinery in solid wood, stone and metal — designed and built in our own workshops to outlast daily use.", hero: "photo-1631396326646-c06a935ff3a6", services: ["Bespoke Furniture", "Tables & Desks", "Seating", "Storage & Joinery"], team: ["Furniture designers", "Master carpenters", "Finishing studio"] },
   { slug: "interiors", name: "INTERIOR DECOR", parent: "Vignette", kicker: "Design + Build", tone: "terracotta", tagline: "Interiors that don't stop at the finishes.", body: "Spatial planning, custom furniture, materials, lighting and installation — designed and executed for residential and commercial spaces.", hero: "photo-1600585154340-be6161a56a0c", services: ["Residential", "Hospitality", "Retail", "Bespoke Furniture"], team: ["Design leads", "Project executioners", "Craft partners"] },
-];
+]);
 
-const livingStudio = {
+const livingStudio = wordpressContent("livingStudio", {
   name: "Air BnB Living Studio",
   kicker: "Stayable showroom",
   tagline: "Not a showroom — a home we built ourselves.",
   body: "A guesthouse we built ourselves — our own stone, flooring, finishes and furniture throughout. Stay the night, live with every surface and plan your project from inside a working home.",
   hero: "photo-1600607687939-ce8a6c25118c",
   details: ["Three suites", "Material library", "Hosted walkthroughs"],
-};
+});
 
-const stays = [
+const stays = wordpressContent("stays", [
   // Premium — experience our work first-hand
   { slug: "living-studio", tier: "Premium", name: "The Living Studio", location: "Alibaug, Maharashtra", price: "₹28,000", guests: 6, bedrooms: 3, hero: "photo-1600607687939-ce8a6c25118c", blurb: "Our flagship stayable showroom — every surface is our own work.", description: "The premium way to experience BDS Marvel: a full guesthouse built end-to-end with our own stone, flooring, finishes and furniture. Stay the night, host your architect over breakfast, walk the materials library with our consultant and specify your project from inside a working reference.", amenities: ["Three ensuite suites", "Hosted materials walkthrough", "Private garden + sunken lounge", "Full breakfast & chef on request", "Sample library access", "Airport transfer on request"] },
   { slug: "stone-pavilion", tier: "Premium", name: "The Stone Pavilion", location: "Lonavala, Maharashtra", price: "₹32,000", guests: 8, bedrooms: 4, hero: "photo-1747258818911-dfde27ecabba", blurb: "A pavilion of glass and our own basalt, wrapped around a reflecting pool.", description: "Four suites arranged around a still reflecting pool, every wall in basalt we cut ourselves. Evenings on the water court, mornings in the sauna — the full BDS Marvel material palette at its most resolved.", amenities: ["Four pool-facing suites", "Private sauna & plunge", "Chef-led dinners", "Materials walkthrough", "Bonfire court", "Driver on call"] },
@@ -56,30 +57,30 @@ const stays = [
   { slug: "workshop-room", tier: "Budget-friendly", name: "The Workshop Room", location: "Kishangarh, Rajasthan", price: "₹4,200", guests: 2, bedrooms: 1, hero: "photo-1759264244746-140bbbc54e1b", blurb: "Fall asleep to the smell of cut stone — a room inside our workshop compound.", description: "A snug room inside the workshop compound for people who want to wake up where the material is made. Early morning cutting demos if you ask nicely.", amenities: ["Queen bed, ensuite", "Inside the workshop compound", "Cutting demos on request", "Studio breakfast", "Self check-in"] },
   { slug: "sunroom", tier: "Budget-friendly", name: "The Sunroom", location: "Pushkar, Rajasthan", price: "₹4,600", guests: 2, bedrooms: 1, hero: "photo-1781004667187-d1f862f8fa0b", blurb: "A glass-cornered room that catches the desert morning.", description: "A corner room wrapped in glass on two sides, five minutes from the lake ghats. Sunrise does the decorating; we did the stone floor and the very good mattress.", amenities: ["Glass corner room", "Stone floor", "Lake ghats 5 min", "Rooftop chai", "Self check-in"] },
   { slug: "lime-wash-room", tier: "Budget-friendly", name: "The Lime Wash Room", location: "Jaipur, Rajasthan", price: "₹4,900", guests: 2, bedrooms: 1, hero: "photo-1780399334790-64af9ffb45fc", blurb: "Hand-trowelled lime walls and a deep, dark night's sleep.", description: "A cocoon of hand-trowelled lime plaster in the old city — cool in summer, warm at night, with a tiny balcony for evening chai. Our cheapest night, and many guests' favourite.", amenities: ["Queen bed", "Hand-trowelled lime walls", "Chai balcony", "Old-city location", "Self check-in"] },
-];
+]);
 
-const stayTiers = [
+const stayTiers = wordpressContent("stayTiers", [
   { slug: "premium", name: "Premium", headline: "Experience our work, first-hand.", copy: "Full homes built end-to-end with our own stone, floors and furniture — hosted walkthroughs, chef breakfasts and the materials library. Live in the reference before you specify it." },
   { slug: "mid", name: "Mid", headline: "Design comfort, city ease.", copy: "Finished apartments wearing our oak, stone and lime — work tables, good kitchens, self check-in and easy nightly rates." },
   { slug: "budget-friendly", name: "Budget-friendly", headline: "Honest rooms, honest prices.", copy: "Simple, light-filled rooms near our workshops and the old cities — the essentials done properly, from ₹3,900 a night." },
-];
+]);
 
 registerStaysData({ stays, stayTiers, img });
 
 const tierSlugOf = (tierName) => stayTiers.find((tier) => tier.name === tierName)?.slug || "premium";
 
-const approach = [
+const approach = wordpressContent("approach", [
   { number: "01", title: "MATERIAL FIRST", image: "photo-1618221195710-dd6b41faaea6", text: "Every project begins with the stone or the surface. Specification precedes drawings so the material never has to bend to fit the design." },
   { number: "02", title: "ONE TEAM", image: "photo-1600585154340-be6161a56a0c", text: "Materials, flooring, construction and interiors under one roof. One accountable team from the spec sheet to the snag list." },
   { number: "03", title: "EDITORIAL DETAIL", image: "photo-1616486338812-3dadae4b4ace", text: "Architectural minimalism, hospitality warmth. Joints, thresholds and reveals resolved with the same care as the elevation." },
   { number: "04", title: "HERITAGE + CRAFT", image: "photo-1503387762-592deb58ef4e", text: "Traditional cutting and finishing techniques paired with modern engineering. Craftspeople we have worked with for two decades." },
   { number: "05", title: "EXPERIENCE-LED", image: "photo-1600607687939-ce8a6c25118c", text: "Don't just see the materials — live in them. The BDSM Living Studio is our showroom you can actually stay in." },
-];
+]);
 
 // Four stone tones shared with the network segments — purposes rotate through them
 const purposeTones = ["sand", "bronze", "charcoal", "terracotta"];
 
-const clients = [
+const clients = wordpressContent("clients", [
   { name: "L&T — LNT Pvt Ltd", logo: publicAsset("/clients/lnt.png") },
   { name: "Mangalam Organics", logo: publicAsset("/clients/mangalam.png") },
   { name: "The Lalit", logo: publicAsset("/clients/lalit.png") },
@@ -104,9 +105,9 @@ const clients = [
   { name: "Ramada Ajmer", logo: publicAsset("/clients/ramada.png") },
   { name: "Satguru Group Ajmer", logo: publicAsset("/clients/satguru.png") },
   { name: "Marriott", logo: publicAsset("/clients/marriott.png") },
-];
+]);
 
-const projects = [
+const projects = wordpressContent("projects", [
   { slug: "meridian-residences", title: "Meridian Residences", segment: "MARBLE & STONE", category: "Residential", image: "photo-1600585154340-be6161a56a0c", gallery: ["photo-1600585154340-be6161a56a0c", "photo-1618221195710-dd6b41faaea6", "photo-1616486338812-3dadae4b4ace"], year: "2024", location: "Alibaug, Maharashtra", description: "Twelve seafront villas clad in a custom facade stone quarried, cut and installed end-to-end.", challenge: "The facade needed to weather the salt air without turning grey.", approach: "We specified a dense sandstone with a low porosity and honed it to bring the warm undertones forward.", outcomes: [["12", "villas delivered"], ["18 mo", "site to handover"], ["100%", "material in-house"]], credits: ["Drawstones — Facade & Interior Stone", "Formwork — Civil & Finishing", "Architect — External partner"] },
   { slug: "kabbon-lounge", title: "Kabbon Lounge", segment: "INTERIOR DECOR", category: "Hospitality", image: "photo-1600607687939-ce8a6c25118c", gallery: ["photo-1600607687939-ce8a6c25118c", "photo-1600566753190-17f0baa2a6c3", "photo-1616486338812-3dadae4b4ace"], year: "2024", location: "Bengaluru, Karnataka", description: "A 90-cover restaurant designed around a single travertine bar block.", challenge: "The client wanted the room to feel monolithic without becoming cold.", approach: "One stone, three finishes — a polished bar top, honed cladding, split-face walls. Warm oak floors soften everything else.", outcomes: [["1", "material palette"], ["4 mo", "design to open"], ["120 sqm", "of stone specified"]], credits: ["Vignette — Concept & Execution", "Drawstones — Travertine sourcing", "Formwork — Fit-out"] },
   { slug: "veda-clubhouse", title: "Veda Clubhouse", segment: "CONSTRUCTION", category: "Amenity", image: "photo-1600566753190-17f0baa2a6c3", gallery: ["photo-1600566753190-17f0baa2a6c3", "photo-1618221195710-dd6b41faaea6", "photo-1600585154340-be6161a56a0c"], year: "2023", location: "Pune, Maharashtra", description: "A residential clubhouse — pool, gym, event spaces — built as one continuous stone ribbon.", challenge: "Every wall inside and out had to read as the same material.", approach: "We wrapped the volume in a Kota-limestone rain screen and continued the same stone through the pool coping and lobby floor.", outcomes: [["2,400 sqm", "built-up"], ["3", "levels"], ["14 mo", "structure to soft launch"]], credits: ["Formwork — Structure & Finishing", "Drawstones — Kota supply", "Renest — Pool decking"] },
@@ -117,9 +118,9 @@ const projects = [
   { slug: "kiln-restaurant", title: "Kiln Restaurant", segment: "CONSTRUCTION", category: "Hospitality", image: "photo-1600566753190-17f0baa2a6c3", gallery: ["photo-1600566753190-17f0baa2a6c3", "photo-1600607687939-ce8a6c25118c", "photo-1503387762-592deb58ef4e"], year: "2023", location: "Mumbai, Maharashtra", description: "A 3,200 sqft restaurant built around an exposed brick and stone kiln.", challenge: "Structural rework to expose the kiln without losing the load path.", approach: "We ran a new steel transfer above the kiln and let the original masonry become the room.", outcomes: [["1", "kiln, exposed"], ["3,200 sqft", "fit-out"], ["5 mo", "shell to open"]], credits: ["Formwork — Structural, shell & core", "Vignette — Design & Fit-out", "Drawstones — Bar & floor stone"] },
   { slug: "lumen-apartment", title: "Lumen Apartment", segment: "INTERIOR DESIGNING", category: "Residential", image: "photo-1631679706909-1844bbd07221", gallery: ["photo-1631679706909-1844bbd07221", "photo-1618220179428-22790b461013", "photo-1600585154340-be6161a56a0c"], year: "2024", location: "Bengaluru, Karnataka", description: "A full interior-designing brief for a light-first city apartment, resolved end-to-end before a single wall moved.", challenge: "A dark, compartmentalised flat that needed to feel open without losing storage.", approach: "We redrew the plan around a single daylight axis, set a warm neutral palette and detailed every joinery run in 3D before build.", outcomes: [["1,650 sqft", "reimagined"], ["3D", "sign-off before build"], ["6 wk", "concept to drawings"]], credits: ["BDS Marvel — Concept, planning & detailing", "Renest — Oak flooring", "Formwork — Fit-out"] },
   { slug: "sable-studio-office", title: "Sable Studio Office", segment: "INTERIOR DESIGNING", category: "Commercial", image: "photo-1618220179428-22790b461013", gallery: ["photo-1618220179428-22790b461013", "photo-1631679706909-1844bbd07221", "photo-1616486338812-3dadae4b4ace"], year: "2023", location: "Jaipur, Rajasthan", description: "Interior designing for a creative studio — spatial planning, material palette and lighting concept delivered as one scheme.", challenge: "Give a 20-person studio focus zones and social zones inside one open floor.", approach: "Zoning by material and light: honed stone at the core, warm oak at the edges, layered task and ambient lighting throughout.", outcomes: [["20", "person studio"], ["4", "material palette"], ["5 mo", "design to move-in"]], credits: ["BDS Marvel — Full interior-design scope", "Drawstones — Core stone", "Renest — Oak & contract flooring"] },
-];
+]);
 
-const catalogueItems = [
+const catalogueItems = wordpressContent("catalogueItems", [
   // DrawStones — the signature product range
   { slug: "center-end-tables", name: "Centre & End Tables", brand: "DrawStones", material: "Marble", product: "Tables", application: "Living", image: "photo-1692262089751-7e26b69ad8d1", origin: "Black & white marble" },
   { slug: "marble-inlay-tops", name: "Marble Inlay Table Tops", brand: "DrawStones", material: "Marble", product: "Tables", application: "Living", image: "photo-1506463108611-88834e9f6169", origin: "Pietra dura inlay" },
@@ -168,10 +169,10 @@ const catalogueItems = [
   { slug: "artificial-plants-green-walls", name: "Artificial Plants & Green Walls", brand: "Vignette", category: "Interior Decor", material: "Greenery", product: "Greenery", application: "Interior", image: "photo-1585506774639-5e2f8fda6352", origin: "Vertical gardens" },
   { slug: "decorative-planters", name: "Planters", brand: "Vignette", category: "Interior Decor", material: "Ceramic & stone", product: "Planters", application: "Interior", image: "photo-1588440691140-09155c1be58a", origin: "Pots & urns" },
   { slug: "garden-umbrella-gazebo", name: "Garden Umbrella & Gazebo", brand: "Vignette", category: "Interior Decor", material: "Outdoor", product: "Outdoor", application: "Garden", image: "photo-1784454793008-3d6e632db3d7", origin: "Shade & outdoor living" },
-];
+]);
 
 // Extended detail content for catalogue items and per-service catalogue cards, keyed by slug.
-const catalogueDetails = {
+const catalogueDetails = wordpressContent("catalogueDetails", {
   "center-end-tables": { brand: "DrawStones", consult: "Marble & Stone Consulting", desc: "A collection of marble centre and end tables that redefine sophistication in living spaces — each top showing the timeless allure of carefully chosen black and white marble and its natural patterns.", specs: [["Material", "Black & white marble"], ["Build", "Solid top, crafted base"], ["Lead time", "4 – 6 weeks"]], gallery: ["photo-1692262089751-7e26b69ad8d1", "photo-1649011327045-624a1bd2c3e7", "photo-1614348531934-c338408a46bb"] },
   "marble-inlay-tops": { brand: "DrawStones", consult: "Marble & Stone Consulting", desc: "A captivating collection of marble inlay table tops where the timeless art of pietra dura meets luxury — florals and geometries cut from coloured stone and set by hand, with full customisation.", specs: [["Craft", "Pietra dura inlay"], ["Customisation", "Pattern & stone"], ["Lead time", "6 – 8 weeks"]], gallery: ["photo-1506463108611-88834e9f6169", "photo-1531165424588-80b93de6f807", "photo-1784937275795-685af009b219"] },
   "marble-stone-fireplace": { brand: "DrawStones", consult: "Marble & Stone Consulting", desc: "Fireplaces that make a statement — elevating a living space with the warmth and natural elegance of marble and stone, hand-finished and built to order.", specs: [["Material", "Marble & stone"], ["Finish", "Natural, hand-finished"], ["Lead time", "6 – 8 weeks"]], gallery: ["photo-1603039531759-1a1bbe4f9f94", "photo-1612031737124-28aeae3f2863", "photo-1648303098204-258fc88bc69f"] },
@@ -227,9 +228,9 @@ const catalogueDetails = {
   "space-planning": { brand: "BDS Marvel", consult: "Interior Design Consulting", desc: "Spatial planning that resolves flow, storage and daylight — plans drawn around how the space is actually lived in, before build.", specs: [["Deliverable", "Space plans"], ["Focus", "Flow · storage · light"], ["Lead time", "2 – 3 weeks"]], gallery: ["photo-1618220179428-22790b461013", "photo-1631679706909-1844bbd07221", "photo-1616486338812-3dadae4b4ace"] },
   "material-palettes": { brand: "BDS Marvel", consult: "Interior Design Consulting", desc: "Material palettes sampled together — stone, flooring, plaster and timber approved as a set so the finished room reads as one.", specs: [["Deliverable", "Physical palette"], ["Range", "Stone · floor · plaster · wood"], ["Lead time", "1 – 2 weeks"]], gallery: ["photo-1600585154340-be6161a56a0c", "photo-1618221195710-dd6b41faaea6", "photo-1780399334790-64af9ffb45fc"] },
   "3d-visualisation": { brand: "BDS Marvel", consult: "Interior Design Consulting", desc: "Photoreal 3D visualisation so you sign off the space before it is built — every material, light and detail resolved on screen first.", specs: [["Deliverable", "3D renders"], ["Sign-off", "Before build"], ["Lead time", "2 – 4 weeks"]], gallery: ["photo-1631396326646-c06a935ff3a6", "photo-1631679706909-1844bbd07221", "photo-1618220179428-22790b461013"] },
-};
+});
 
-const categoriesFilter = ["All", "Interior Designing", "Construction", "Marble & Stone", "Flooring", "Furniture", "Interior Decor"];
+const categoriesFilter = ["All", ...new Set(catalogueItems.map(i => i.category || "Marble & Stone"))];
 const categoryOf = (item) => item.category || "Marble & Stone";
 
 function useReveal() {
@@ -256,17 +257,17 @@ function usePageMeta(title, description) {
   }, [title, description]);
 }
 
-const SEGMENT_SEO = {
+const SEGMENT_SEO = wordpressContent("SEGMENT_SEO", {
   "interior-designing": ["Interior Designing — BDS Marvel | BDSM · BDS Marvel", "BDS Marvel, the interior designing team at BDSM: concept, spatial planning, material palettes and detailing for residential and commercial spaces."],
   "marble-and-stone": ["Marble & Stone Supplier in India — Drawstones | BDSM · BDS Marvel", "Drawstones, the stone team at BDSM · BDS Marvel: marble, granite, kota and travertine sourcing, cutting and installation for facades and interiors."],
   flooring: ["SPC & Wood Flooring — Renest | BDSM · BDS Marvel", "Renest, the flooring team at BDSM · BDS Marvel: SPC, engineered oak and hospitality-grade flooring, specified and installed by one in-house team."],
   construction: ["Turnkey Construction — Formwork | BDSM · BDS Marvel", "Formwork, the construction team at BDSM · BDS Marvel: turnkey structures, fitouts and site execution under one contract."],
   interiors: ["Interior Design & Build — Vignette | BDSM · BDS Marvel", "Vignette, the interior design team at BDSM · BDS Marvel: residential and commercial interiors, bespoke furniture and full execution."],
   furniture: ["Bespoke Furniture — Grain | BDSM · BDS Marvel", "Grain, the furniture studio at BDSM · BDS Marvel: bespoke tables, seating, storage and joinery designed and built in-house."],
-};
+});
 
 // Per-service consulting coverage + optional visual catalogue, keyed by segment slug.
-const serviceExtras = {
+const serviceExtras = wordpressContent("serviceExtras", {
   "interior-designing": {
     consultService: "Interior Design Consulting",
     consultLine: "Professional interior design consulting — from first concept to resolved detail.",
@@ -343,7 +344,7 @@ const serviceExtras = {
       { slug: "furniture-materials", name: "Materials & Finishes", image: "photo-1618221195710-dd6b41faaea6", desc: "Solid wood, stone, metal and lacquer.", meta: "Material · Finish" },
     ],
   },
-};
+});
 
 const consultServices = Object.values(serviceExtras).map((extra) => extra.consultService);
 
@@ -488,15 +489,15 @@ function Home() {
             <div className="purpose-accordion-panel__inner">
               <div className={`purpose-feature purpose-feature--mobile purpose-feature--tone-${purposeTones[index % 4]}`} style={{ backgroundImage: `linear-gradient(90deg, rgba(8,8,8,.82), rgba(8,8,8,.08)), url(${img(purpose.image)})` }}>
                 <div><span>{purpose.number} / 05</span><h3>{purpose.title}</h3><p>{purpose.text}</p></div>
-                <div className="purpose-arrows"><button onClick={() => setActiveApproach((index + 4) % 5)} aria-label="Previous purpose" data-testid={`purpose-mobile-previous-${index + 1}`}><ArrowUpRight size={20} /></button><button onClick={() => setActiveApproach((index + 1) % 5)} aria-label="Next purpose" data-testid={`purpose-mobile-next-${index + 1}`}><ArrowUpRight size={20} /></button></div>
+                <div className="purpose-arrows"><button onClick={() => setActiveApproach((index + approach.length - 1) % approach.length)} aria-label="Previous purpose" data-testid={`purpose-mobile-previous-${index + 1}`}><ArrowUpRight size={20} /></button><button onClick={() => setActiveApproach((index + 1) % approach.length)} aria-label="Next purpose" data-testid={`purpose-mobile-next-${index + 1}`}><ArrowUpRight size={20} /></button></div>
               </div>
             </div>
           </div>
         </div>)}</div>
-        <div key={activeApproach} className={`purpose-feature purpose-feature--desktop purpose-feature--tone-${purposeTones[activeApproach % 4]}`} style={{ backgroundImage: `linear-gradient(90deg, rgba(8,8,8,.82), rgba(8,8,8,.08)), url(${img(approach[activeApproach].image)})` }} data-testid="active-purpose-panel">
+        {approach.length > 0 && <div key={activeApproach} className={`purpose-feature purpose-feature--desktop purpose-feature--tone-${purposeTones[activeApproach % 4]}`} style={{ backgroundImage: `linear-gradient(90deg, rgba(8,8,8,.82), rgba(8,8,8,.08)), url(${img(approach[activeApproach].image)})` }} data-testid="active-purpose-panel">
           <div><span>{approach[activeApproach].number} / 05</span><h3>{approach[activeApproach].title}</h3><p>{approach[activeApproach].text}</p></div>
-          <div className="purpose-arrows"><button onClick={() => setActiveApproach((activeApproach + 4) % 5)} data-testid="purpose-previous-button"><ArrowUpRight size={20} /></button><button onClick={() => setActiveApproach((activeApproach + 1) % 5)} data-testid="purpose-next-button"><ArrowUpRight size={20} /></button></div>
-        </div>
+          <div className="purpose-arrows"><button onClick={() => setActiveApproach((activeApproach + approach.length - 1) % approach.length)} data-testid="purpose-previous-button"><ArrowUpRight size={20} /></button><button onClick={() => setActiveApproach((activeApproach + 1) % approach.length)} data-testid="purpose-next-button"><ArrowUpRight size={20} /></button></div>
+        </div>}
       </div>
     </section>
     <ProjectsSlideshow />
@@ -513,11 +514,11 @@ function ProjectsSlideshow() {
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef(null);
   useEffect(() => {
-    if (paused) return undefined;
+    if (paused || !projects.length) return undefined;
     const id = setInterval(() => setActive((index) => (index + 1) % projects.length), 5000);
     return () => clearInterval(id);
   }, [paused]);
-  const project = projects[active];
+  const project = projects[active % projects.length];
   const showNext = () => setActive((index) => (index + 1) % projects.length);
   const showPrev = () => setActive((index) => (index + projects.length - 1) % projects.length);
   const onTouchStart = (event) => { touchStartX.current = event.touches[0].clientX; };
@@ -528,6 +529,7 @@ function ProjectsSlideshow() {
     if (Math.abs(delta) < 40) return;
     if (delta < 0) showNext(); else showPrev();
   };
+  if (!project) return null;
   return <section className="work-slideshow" id="work" data-testid="work-slideshow" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
     <Reveal className="work-slideshow__head">
       <span className="section-index">03 — PROJECT CATALOGUE</span>
@@ -973,7 +975,7 @@ function ConsultationModal() {
       }
       const response = await apiFetch(apiPath(`/consultations`), {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify({ ...form,
           name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(),
           city: form.city.trim() || null, project_type: form.projectType || null,
           service: form.service, requirements: form.requirements.trim(),
@@ -1003,19 +1005,10 @@ function ConsultationModal() {
         <p>Tell us about your project and pick the service you need guidance on. Our specialist will reply within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="consultation-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>Your consultation request is in. Our specialist will be in touch shortly.</p><button onClick={closeConsult} data-testid="consultation-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="consultation-modal-form">
-        <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="consult-name-input" /></label>
-        <label className="cm-field"><span>Phone</span><input required value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="consult-phone-input" /></label>
-        <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="consult-email-input" /></label>
-        <label className="cm-field"><span>City</span><input value={form.city} onChange={update("city")} placeholder="Jaipur" data-testid="consult-city-input" /></label>
-        <label className="cm-field"><span>Project type</span><select value={form.projectType} onChange={update("projectType")} data-testid="consult-projecttype-select"><option value="">Select</option><option value="Residential">Residential</option><option value="Hospitality">Hospitality</option><option value="Commercial">Commercial</option><option value="Retail">Retail</option><option value="Institutional">Institutional</option></select></label>
-        <label className="cm-field"><span>Service</span><select required value={form.service} onChange={update("service")} data-testid="consult-service-select"><option value="">Select a service</option>{consultServices.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
-        <label className="cm-field"><span>Project size</span><input value={form.projectSize} onChange={update("projectSize")} placeholder="e.g. 1800 sqft / 3BHK" data-testid="consult-size-input" /></label>
-        <label className="cm-field"><span>Budget range</span><select value={form.budget} onChange={update("budget")} data-testid="consult-budget-select"><option value="">Prefer not to say</option><option value="under-25L">Under ₹25L</option><option value="25L-1Cr">₹25L – ₹1Cr</option><option value="1-5Cr">₹1Cr – ₹5Cr</option><option value="5Cr-plus">₹5Cr +</option></select></label>
-        <label className="cm-field cm-field--full"><span>Requirements</span><textarea required rows={4} value={form.requirements} onChange={update("requirements")} placeholder="Brief, materials in mind, timelines — anything helps." data-testid="consult-requirements-input" /></label>
-        <label className="cm-field cm-field--full cm-file"><span>Reference image / file (optional)</span><input type="file" accept="image/*,.pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} data-testid="consult-file-input" />{file && <em className="cm-file__name">{file.name}</em>}</label>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="consultation-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>{formSettings("consultations")?.success_message || "Your request has been received."}</p><button onClick={closeConsult} data-testid="consultation-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="consultation-modal-form">
+        <DynamicFields slug="consultations" form={form} setForm={setForm} firstFieldRef={firstFieldRef} options={{ service: [{value:"",label:"Select a service"}, ...consultServices], projectType: [] }} file={file} setFile={setFile} />
         {status.state === "error" && <div className="cm-error" data-testid="consultation-modal-error">{status.error}</div>}
-        <button type="submit" className="cm-submit" disabled={status.state === "sending"} data-testid="consultation-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>REQUEST CONSULTATION <ArrowUpRight size={16} /></>}</button>
+        <button type="submit" className="cm-submit" disabled={status.state === "sending" || !formSettings("consultations")?.enabled} data-testid="consultation-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>{formSettings("consultations")?.submit_label || "REQUEST CONSULTATION"} <ArrowUpRight size={16} /></>}</button>
       </form>}
     </div>
   </div>;
@@ -1054,7 +1047,7 @@ function SampleModal() {
     try {
       const response = await apiFetch(apiPath(`/sample-requests`), {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify({ ...form,
           product, brand: brand || null,
           name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(),
           address: form.address.trim(), city: form.city.trim() || null,
@@ -1083,16 +1076,10 @@ function SampleModal() {
         <p data-testid="sample-modal-product">{product}{brand ? ` · ${brand}` : ""} — tell us a little about your project and we will come back with pricing and lead times within one working day. Add a delivery or site address if you would also like physical samples.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="sample-modal-success"><Check size={40} /><h3>Quote request received.</h3><p>We will come back with pricing for your {product} within one working day.</p><button onClick={closeSample} data-testid="sample-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="sample-modal-form">
-        <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="sample-name-input" /></label>
-        <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="sample-email-input" /></label>
-        <label className="cm-field"><span>Phone</span><input required value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="sample-phone-input" /></label>
-        <label className="cm-field"><span>City</span><input value={form.city} onChange={update("city")} placeholder="Jaipur" data-testid="sample-city-input" /></label>
-        <label className="cm-field cm-field--full"><span>Shipping address (optional)</span><textarea rows={3} value={form.address} onChange={update("address")} placeholder="Studio or site address the sample should reach" data-testid="sample-address-input" /></label>
-        <label className="cm-field"><span>Pincode</span><input value={form.pincode} onChange={update("pincode")} placeholder="302001" data-testid="sample-pincode-input" /></label>
-        <label className="cm-field"><span>Notes (optional)</span><input value={form.notes} onChange={update("notes")} placeholder="Finish, thickness, timeline…" data-testid="sample-notes-input" /></label>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="sample-modal-success"><Check size={40} /><h3>Quote request received.</h3><p>{formSettings("sample-requests")?.success_message || "Your request has been received."}</p><button onClick={closeSample} data-testid="sample-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="sample-modal-form">
+        <DynamicFields slug="sample-requests" form={form} setForm={setForm} firstFieldRef={firstFieldRef}  />
         {status.state === "error" && <div className="cm-error" data-testid="sample-modal-error">{status.error}</div>}
-        <button type="submit" className="cm-submit" disabled={status.state === "sending"} data-testid="sample-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>REQUEST QUOTE <ArrowUpRight size={16} /></>}</button>
+        <button type="submit" className="cm-submit" disabled={status.state === "sending" || !formSettings("sample-requests")?.enabled} data-testid="sample-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>{formSettings("sample-requests")?.submit_label || "REQUEST QUOTE"} <ArrowUpRight size={16} /></>}</button>
       </form>}
     </div>
   </div>;
@@ -1135,7 +1122,7 @@ function InquiryModal() {
     try {
       const response = await apiFetch(apiPath(`/product-inquiries`), {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify({ ...form,
           name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() || null,
           brand, product: form.product || null,
           quantity: form.quantity.trim() || null, message: form.message.trim(),
@@ -1163,15 +1150,10 @@ function InquiryModal() {
         <p data-testid="inquiry-modal-brand">Enquiring under {brand}. Tell us what you need and roughly how much — the {brand} desk replies within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="inquiry-modal-success"><Check size={40} /><h3>Inquiry sent.</h3><p>The {brand} desk will come back with pricing and availability within one working day.</p><button onClick={closeInquiry} data-testid="inquiry-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="inquiry-modal-form">
-        <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="inquiry-name-input" /></label>
-        <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="inquiry-email-input" /></label>
-        <label className="cm-field"><span>Phone (optional)</span><input value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="inquiry-phone-input" /></label>
-        <label className="cm-field"><span>Product interest</span><select value={form.product} onChange={update("product")} data-testid="inquiry-product-select"><option value="">Multiple / not sure yet</option>{productOptions.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
-        <label className="cm-field cm-field--full"><span>Approx. quantity</span><input value={form.quantity} onChange={update("quantity")} placeholder="e.g. 200 sqft · 40 sheets · 12 rooms" data-testid="inquiry-quantity-input" /></label>
-        <label className="cm-field cm-field--full"><span>Your requirement</span><textarea required rows={4} value={form.message} onChange={update("message")} placeholder="Project, finishes in mind, delivery city, timeline — anything helps." data-testid="inquiry-message-input" /></label>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="inquiry-modal-success"><Check size={40} /><h3>Inquiry sent.</h3><p>{formSettings("product-inquiries")?.success_message || "Your request has been received."}</p><button onClick={closeInquiry} data-testid="inquiry-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="inquiry-modal-form">
+        <DynamicFields slug="product-inquiries" form={form} setForm={setForm} firstFieldRef={firstFieldRef} options={{ product: [{value:"",label:"Multiple / not sure yet"}, ...productOptions] }} />
         {status.state === "error" && <div className="cm-error" data-testid="inquiry-modal-error">{status.error}</div>}
-        <button type="submit" className="cm-submit" disabled={status.state === "sending"} data-testid="inquiry-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>SEND INQUIRY <ArrowUpRight size={16} /></>}</button>
+        <button type="submit" className="cm-submit" disabled={status.state === "sending" || !formSettings("product-inquiries")?.enabled} data-testid="inquiry-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>{formSettings("product-inquiries")?.submit_label || "SEND INQUIRY"} <ArrowUpRight size={16} /></>}</button>
       </form>}
     </div>
   </div>;
@@ -1206,7 +1188,7 @@ function ContactModal() {
     event.preventDefault();
     setStatus({ state: "sending", error: "" });
     try {
-      const response = await apiFetch(apiPath(`/inquiries`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), company: form.company.trim() || null, agency: form.segment || null, budget: form.budget || null, message: form.message.trim() }) });
+      const response = await apiFetch(apiPath(`/inquiries`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form,  name: form.name.trim(), email: form.email.trim(), company: form.company.trim() || null, agency: form.segment || null, budget: form.budget || null, message: form.message.trim() }) });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
         throw new Error(detail?.detail?.[0]?.msg || detail?.detail || detail?.message || "Please double-check your details and try again.");
@@ -1229,15 +1211,10 @@ function ContactModal() {
         <p>Tell us about your project — stone, flooring, construction or interiors. One team handles all of it, and we reply within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="contact-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>The team will be in touch shortly. In the meantime, feel free to explore the projects and catalogue.</p><button onClick={() => setOpen(false)} data-testid="contact-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="contact-modal-form">
-        <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="contact-name-input" /></label>
-        <label className="cm-field"><span>Work email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="contact-email-input" /></label>
-        <label className="cm-field"><span>Company / Studio</span><input value={form.company} onChange={update("company")} placeholder="BDSM" data-testid="contact-company-input" /></label>
-        <label className="cm-field"><span>What does your project need?</span><select value={form.segment} onChange={update("segment")} data-testid="contact-agency-select"><option value="">Not sure yet</option>{segments.map((segment) => <option key={segment.slug} value={segment.name}>{segment.name}</option>)}</select></label>
-        <label className="cm-field cm-field--full"><span>Rough budget</span><select value={form.budget} onChange={update("budget")} data-testid="contact-budget-select"><option value="">Prefer not to say</option><option value="under-25L">Under ₹25L</option><option value="25L-1Cr">₹25L – ₹1Cr</option><option value="1-5Cr">₹1Cr – ₹5Cr</option><option value="5Cr-plus">₹5Cr +</option></select></label>
-        <label className="cm-field cm-field--full"><span>Tell us about the project</span><textarea required rows={4} value={form.message} onChange={update("message")} placeholder="Site, brief, materials in mind — anything helps." data-testid="contact-message-input" /></label>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="contact-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>{formSettings("inquiries")?.success_message || "Your request has been received."}</p><button onClick={() => setOpen(false)} data-testid="contact-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="contact-modal-form">
+        <DynamicFields slug="inquiries" form={form} setForm={setForm} firstFieldRef={firstFieldRef} options={{ segment: [{value:"",label:"Not sure yet"}, ...segments.map(s => s.name)] }} />
         {status.state === "error" && <div className="cm-error" data-testid="contact-modal-error">{status.error}</div>}
-        <button type="submit" className="cm-submit" disabled={status.state === "sending"} data-testid="contact-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>SEND INQUIRY <ArrowUpRight size={16} /></>}</button>
+        <button type="submit" className="cm-submit" disabled={status.state === "sending" || !formSettings("inquiries")?.enabled} data-testid="contact-modal-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>{formSettings("inquiries")?.submit_label || "SEND INQUIRY"} <ArrowUpRight size={16} /></>}</button>
       </form>}
     </div>
   </div>;
@@ -1305,10 +1282,11 @@ function SegmentPage() {
 
 function ProjectPage() {
   const { slug } = useParams();
-  const project = projects.find((item) => item.slug === slug) || projects[0];
-  const segment = segments.find((item) => item.name === project.segment);
+  const project = projects.find((item) => item.slug === slug);
+  const segment = segments.find((item) => item.name === project?.segment);
   const nextProject = projects[(projects.indexOf(project) + 1) % projects.length];
-  usePageMeta(`${project.title} | BDSM · BDS Marvel Projects`, `${project.title} — a ${project.category.toLowerCase()} project in ${project.location}, designed and delivered in-house by BDSM · BDS Marvel.`);
+  usePageMeta(project ? `${project.title} | BDSM · BDS Marvel Projects` : "Projects", project?.description || "Projects");
+  if (!project) return <Navigate to="/projects" replace />;
   return <main className={`case-study-page case-study-page--${segment?.tone || "sand"}`} data-testid="case-study-page">
     <section className="case-study-hero"><div className="detail-kicker"><span>{project.segment.toUpperCase()} · {project.year}</span><Link to="/projects" state={{ restore: true }} data-testid="case-study-back-link">BACK TO PROJECTS</Link></div><div className="case-study-hero-copy"><span className="section-index">{project.category.toUpperCase()} · {project.location}</span><h1>{project.title}<span className="hero-dot">.</span></h1><p>{project.description}</p></div><div className="case-study-hero-image"><img src={img(project.image)} alt="" data-testid="case-study-hero-image" /></div></section>
     <section className="case-study-overview"><div className="case-study-overview-label"><span className="section-index">01 — THE BRIEF</span><Link to={`/businesses/${segment?.slug || "marble-and-stone"}`} data-testid="case-study-agency-link">VIEW {project.segment.toUpperCase()} <ArrowUpRight size={15} /></Link></div><div className="case-study-story"><div><span className="story-label">THE CHALLENGE</span><h2>{project.challenge}</h2></div><div><span className="story-label">THE APPROACH</span><p>{project.approach}</p></div></div></section>
@@ -1436,7 +1414,7 @@ function ProductQuoteModal({ open, onClose, details }) {
     try {
       const response = await apiFetch(apiPath(`/quote-requests`), {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify({ ...form,
           product: details.product, collection: details.collection, brand: details.brand, material: details.material,
           finish: details.finish, use: details.use, product_url: window.location.href, image: details.image,
           name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), city: form.city.trim() || null,
@@ -1467,17 +1445,10 @@ function ProductQuoteModal({ open, onClose, details }) {
         </div>
         <p>These product details are attached to your request automatically. We reply with pricing and lead times within one working day.</p>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="product-quote-success"><Check size={40} /><h3>Quote request received.</h3><p>We will come back with pricing for {details.product} within one working day.</p><button onClick={onClose} data-testid="product-quote-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="product-quote-form">
-        <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="pq-name-input" /></label>
-        <label className="cm-field"><span>Phone</span><input required value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="pq-phone-input" /></label>
-        <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="pq-email-input" /></label>
-        <label className="cm-field"><span>City</span><input value={form.city} onChange={update("city")} placeholder="Jaipur" data-testid="pq-city-input" /></label>
-        <label className="cm-field"><span>Quantity / area</span><input value={form.quantity} onChange={update("quantity")} placeholder="e.g. 2 pieces / 450 sqft" data-testid="pq-quantity-input" /></label>
-        <label className="cm-field"><span>Needed by</span><select value={form.timeline} onChange={update("timeline")} data-testid="pq-timeline-select"><option value="">Flexible</option><option value="Within 2 weeks">Within 2 weeks</option><option value="Within 1 month">Within 1 month</option><option value="1–3 months">1–3 months</option><option value="3+ months">3+ months</option></select></label>
-        <label className="cm-field cm-field--full"><span>Message (optional)</span><textarea rows={3} value={form.message} onChange={update("message")} placeholder="Size, finish, colour or anything else about this product." data-testid="pq-message-input" /></label>
-        <label className="pq-check cm-field--full"><input type="checkbox" checked={form.wantSample} onChange={update("wantSample")} data-testid="pq-sample-checkbox" /><span>Also send me a physical sample of this product</span></label>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="product-quote-success"><Check size={40} /><h3>Quote request received.</h3><p>{formSettings("quote-requests")?.success_message || "Your request has been received."}</p><button onClick={onClose} data-testid="product-quote-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="product-quote-form">
+        <DynamicFields slug="quote-requests" form={form} setForm={setForm} firstFieldRef={firstFieldRef}  />
         {status.state === "error" && <div className="cm-error" data-testid="product-quote-error">{status.error}</div>}
-        <button type="submit" className="cm-submit" disabled={status.state === "sending"} data-testid="product-quote-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>REQUEST QUOTE <ArrowUpRight size={16} /></>}</button>
+        <button type="submit" className="cm-submit" disabled={status.state === "sending" || !formSettings("quote-requests")?.enabled} data-testid="product-quote-submit">{status.state === "sending" ? <><Loader2 size={16} className="cm-spin" /> Sending…</> : <>{formSettings("quote-requests")?.submit_label || "REQUEST QUOTE"} <ArrowUpRight size={16} /></>}</button>
       </form>}
     </div>
   </div>;
@@ -1787,14 +1758,14 @@ function StaysCategoryPage() {
 function ContactPage() {
   usePageMeta("Contact Us | BDSM · BDS Marvel", "Talk to BDSM · BDS Marvel about your project — studios in Mumbai, Kishangarh, Gurugram, Pune, New Delhi and Goa. We reply within one working day.");
   const { setOpen } = useContact();
-  const cities = [
+  const cities = wordpressContent("cities", [
     { code: "MUM", brand: "BDSM", city: "Mumbai", address: "Sales & Design Studio · Kalina, Santacruz East, Mumbai, Maharashtra 400098" },
     { code: "KSN", brand: "DRAWSTONES", city: "Kishangarh", address: "Marble Workshop · RIICO Marble Zone, Kishangarh, Ajmer, Rajasthan 305801" },
     { code: "GGN", brand: "RENEST", city: "Gurugram", address: "Flooring Warehouse · Sector 49, Sohna Road, Gurugram, Haryana 122018" },
     { code: "PNE", brand: "FORMWORK", city: "Pune", address: "Construction Office · Baner-Pashan Link Road, Pune, Maharashtra 411045" },
     { code: "DEL", brand: "VIGNETTE", city: "New Delhi", address: "Interior Design Studio · Shahpur Jat, New Delhi 110049" },
     { code: "GOA", brand: "LIVING STUDIO", city: "Goa", address: "BDSM Living Studio · Assagao, Bardez, North Goa 403507" },
-  ];
+  ]);
   const [active, setActive] = useState(0);
   return <main className="contact-page" data-testid="contact-page">
     <section className="contact-page__hero"><h1>Come see<br /><em>the material.</em></h1></section>
@@ -1865,15 +1836,15 @@ function ContactPage() {
 
 function AboutPage() {
   usePageMeta("About Us | BDSM · BDS Marvel", "One design and build company for stone, flooring, construction and interiors — 20+ years, 200+ projects, studios across India.");
-  const principles = [
+  const principles = wordpressContent("principles", [
     { number: "01", title: "Material comes first", text: "Before the drawing, we specify the stone or the surface. The rest of the project is designed around what the material actually wants to do." },
     { number: "02", title: "One accountable team", text: "Materials, flooring, construction and interiors all report into a single project lead. Fewer handovers, fewer things lost in translation." },
     { number: "03", title: "Detail is a discipline", text: "Every joint, threshold and reveal is drawn before it's built. Nothing is decided on site that could have been decided at the desk." },
     { number: "04", title: "Craft is not decorative", text: "Traditional cutting and finishing techniques are part of the engineering — not a nostalgia bolted on at the end." },
     { number: "05", title: "Experience over pitch", text: "Instead of a moodboard, we invite clients to stay in a space that uses our full palette. Specify from inside the reference." },
     { number: "06", title: "Long horizons", text: "We build for how a space looks in year ten, not the day it opens." },
-  ];
-  const timeline = [
+  ]);
+  const timeline = wordpressContent("timeline", [
     { year: "2003", event: "First quarry allocation in Kishangarh; workshop begins cutting and polishing." },
     { year: "2008", event: "Facade stone supply for the first hotel group project in Rajasthan." },
     { year: "2013", event: "Flooring line launched — contract SPC and hospitality-grade oak plank." },
@@ -1881,15 +1852,15 @@ function AboutPage() {
     { year: "2020", event: "Interiors studio established for full design + execution." },
     { year: "2023", event: "BDSM · BDS Marvel brings stone, flooring, construction and interior decor under one roof — the Drawstones, Renest, Formwork and Vignette teams." },
     { year: "2024", event: "BDSM Living Studio opens in Goa as our public reference and stayable showroom." },
-  ];
-  const team = [
+  ]);
+  const team = wordpressContent("team", [
     { name: "Drawstones", role: "Materials & Sourcing", image: "photo-1618221195710-dd6b41faaea6" },
     { name: "Renest", role: "Specification & Distribution", image: "photo-1616486338812-3dadae4b4ace" },
     { name: "Formwork", role: "Structure & Site Management", image: "photo-1503387762-592deb58ef4e" },
     { name: "Vignette", role: "Design & Execution", image: "photo-1600585154340-be6161a56a0c" },
     { name: "Head of Craft", role: "Workshop & Fabrication", image: "photo-1600607687939-ce8a6c25118c" },
     { name: "Head of Living Studio", role: "B&B & Client Experience", image: "photo-1600566753190-17f0baa2a6c3" },
-  ];
+  ]);
   return <main className="about-page" data-testid="about-page">
     <section className="about-hero">
       <div className="detail-kicker"><span>BDSM · ABOUT</span><Link to="/" state={{ restore: true }} data-testid="about-back-link">BACK HOME</Link></div>

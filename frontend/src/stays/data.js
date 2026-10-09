@@ -1,3 +1,4 @@
+import { wordpressContent } from "../wordpress-content";
 // Site data (stays, tiers, image helper) is registered by App.js to avoid a circular import
 const source = { stays: [], stayTiers: [], img: (id) => id };
 export function registerStaysData(data) { Object.assign(source, data); cache = null; }
@@ -36,14 +37,14 @@ const REVIEW_POOL = [
 ];
 const REVIEW_MONTHS = ["January 2026", "February 2026", "March 2026", "April 2026", "May 2026"];
 
-export const POLICIES = {
+export const POLICIES = wordpressContent("policies", {
   checkIn: "2:00 PM",
   checkOut: "11:00 AM",
   cancellation: "Free cancellation up to 7 days before check-in. Within 7 days of arrival the first night is non-refundable.",
   rules: ["No parties or events", "No smoking indoors", "Pets on request — host confirms", "Quiet hours 10 PM – 7 AM"],
   safety: ["Smoke alarm", "First-aid kit", "Host on call during your stay"],
   draft: true,
-};
+});
 
 export const priceNum = (text) => Number(String(text).replace(/[^\d]/g, ""));
 export const inr = (n) => `₹${Math.round(n).toLocaleString("en-IN")}`;
@@ -55,14 +56,14 @@ export function getStays() {
   const heroes = baseStays.map((s) => s.hero);
   cache = baseStays.map((stay, i) => {
     const meta = META[stay.slug] || { lat: 22.5, lng: 78.9, type: "Home", beds: stay.bedrooms, baths: stay.bedrooms };
-    const gallery = [stay.hero, ...[1, 4, 7, 10].map((k) => heroes[(i + k) % heroes.length])];
-    const reviews = [0, 1, 2, 3].map((k) => {
+    const gallery = Array.isArray(stay.gallery) ? (stay.gallery.length ? stay.gallery : [stay.hero]) : [stay.hero, ...[1, 4, 7, 10].map((k) => heroes[(i + k) % heroes.length])];
+    const reviews = Array.isArray(stay.reviews) ? stay.reviews : [0, 1, 2, 3].map((k) => {
       const [name, text, rating] = REVIEW_POOL[(i * 3 + k) % REVIEW_POOL.length];
       return { name, text, rating, date: REVIEW_MONTHS[(i + k) % REVIEW_MONTHS.length] };
     });
-    const rating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+    const rating = reviews.length ? reviews.reduce((sum, r) => sum + Number(r.rating), 0) / reviews.length : 0;
     const [city, state] = stay.location.split(",").map((part) => part.trim());
-    return { ...stay, ...meta, city, state: state || city, nightly: priceNum(stay.price), gallery, reviews, rating: Math.round(rating * 100) / 100, minNights: 1, tierSlug: stayTiers.find((t) => t.name === stay.tier)?.slug };
+    return { ...meta, ...stay, city, state: state || city, nightly: priceNum(stay.price), gallery, reviews, rating: Math.round(rating * 100) / 100, minNights: stay.minNights || 1, tierSlug: stayTiers.find((t) => t.name === stay.tier)?.slug };
   });
   return cache;
 }

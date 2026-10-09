@@ -1,2 +1,3 @@
 build-tools/node_modules/
 tests/api-test-results.json
+tests/editable-test-results.json

@@ -15,10 +15,10 @@ const build = path.join(repo, 'wordpress/bds-marvel-app/build');
 await fs.rm(build, { recursive: true, force: true });
 await fs.mkdir(path.join(build, 'static'), { recursive: true });
 const result = await esbuild.build({
-  entryPoints: [path.join(source, 'index.js')], bundle: true, minify: true, jsx: 'automatic',
+  entryPoints: [path.join(source, 'index.js')], bundle: true, minify: true, jsx: 'automatic', jsxImportSource: 'bds-editable',
   outdir: path.join(build, 'static'), entryNames: '[ext]/main.[hash]', assetNames: 'media/[name].[hash]',
   loader: { '.js': 'jsx', '.png': 'file', '.svg': 'file', '.gif': 'file' },
-  alias: { '@': source }, nodePaths: [modules], metafile: true,
+  alias: { '@': source, 'bds-editable/jsx-runtime': path.join(source, 'wordpress-jsx-runtime.js') }, nodePaths: [modules], metafile: true,
   define: { 'process.env.NODE_ENV': '"production"', 'process.env.PUBLIC_URL': '""',
     'process.env.REACT_APP_WORDPRESS_MODE': '"true"', 'process.env.REACT_APP_BACKEND_URL': '""' },
   legalComments: 'linked'
@@ -38,7 +38,7 @@ const entrypoints = outputs.filter(p => /\.(css|js)$/.test(p)).map(p => path.rel
 await fs.writeFile(path.join(build, 'asset-manifest.json'), JSON.stringify({ entrypoints }, null, 2));
 // One authoritative listing catalogue for server-side pricing and guest capacity.
 const app = await fs.readFile(path.join(source, 'App.js'), 'utf8');
-const dataText = app.match(/const stays = (\[[\s\S]*?\n\]);/)[1];
+const dataText = app.match(/const stays = (?:wordpressContent\("stays", )?(\[[\s\S]*?\n\])\)?;/)[1];
 const stays = (new Function(`return ${dataText}`))();
 await fs.writeFile(path.join(repo, 'wordpress/bds-marvel-app/includes/stays.json'), JSON.stringify(stays.map(s => ({
   slug: s.slug, name: s.name, guests: s.guests, nightly: Number(s.price.replace(/[^\d]/g, ''))

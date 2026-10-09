@@ -1,0 +1,478 @@
+{
+  "consultations": {
+    "enabled": true,
+    "submit_label": "REQUEST CONSULTATION",
+    "success_message": "Thanks \u2014 your request has been received.",
+    "notification_email": "",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Your name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Riya Kapoor",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "phone",
+        "label": "Phone",
+        "type": "text",
+        "required": true,
+        "placeholder": "+91 98xxxxxxxx",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "email",
+        "required": true,
+        "placeholder": "you@brand.com",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "city",
+        "label": "City",
+        "type": "text",
+        "required": false,
+        "placeholder": "Jaipur",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "projectType",
+        "label": "Project type",
+        "type": "select",
+        "required": false,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Select"
+          },
+          {
+            "value": "Residential",
+            "label": "Residential"
+          },
+          {
+            "value": "Hospitality",
+            "label": "Hospitality"
+          },
+          {
+            "value": "Commercial",
+            "label": "Commercial"
+          },
+          {
+            "value": "Retail",
+            "label": "Retail"
+          },
+          {
+            "value": "Institutional",
+            "label": "Institutional"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "select",
+        "required": true,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Select a service"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "projectSize",
+        "label": "Project size",
+        "type": "text",
+        "required": false,
+        "placeholder": "e.g. 1800 sqft / 3BHK",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "budget",
+        "label": "Budget range",
+        "type": "select",
+        "required": false,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Prefer not to say"
+          },
+          {
+            "value": "under-25L",
+            "label": "Under \u20b925L"
+          },
+          {
+            "value": "25L-1Cr",
+            "label": "\u20b925L \u2013 \u20b91Cr"
+          },
+          {
+            "value": "1-5Cr",
+            "label": "\u20b91Cr \u2013 \u20b95Cr"
+          },
+          {
+            "value": "5Cr-plus",
+            "label": "\u20b95Cr +"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "requirements",
+        "label": "Requirements",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "Brief, materials in mind, timelines \u2014 anything helps.",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "file",
+        "label": "Reference image / file (optional)",
+        "type": "file",
+        "required": false,
+        "placeholder": "",
+        "options": [],
+        "enabled": true
+      }
+    ]
+  },
+  "sample-requests": {
+    "enabled": true,
+    "submit_label": "REQUEST QUOTE",
+    "success_message": "Thanks \u2014 your request has been received.",
+    "notification_email": "",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Your name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Riya Kapoor",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "email",
+        "required": true,
+        "placeholder": "you@brand.com",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "phone",
+        "label": "Phone",
+        "type": "text",
+        "required": true,
+        "placeholder": "+91 98xxxxxxxx",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "city",
+        "label": "City",
+        "type": "text",
+        "required": false,
+        "placeholder": "Jaipur",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "address",
+        "label": "Shipping address (optional)",
+        "type": "textarea",
+        "required": false,
+        "placeholder": "Studio or site address the sample should reach",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "pincode",
+        "label": "Pincode",
+        "type": "text",
+        "required": false,
+        "placeholder": "302001",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "notes",
+        "label": "Notes (optional)",
+        "type": "text",
+        "required": false,
+        "placeholder": "Finish, thickness, timeline\u2026",
+        "options": [],
+        "enabled": true
+      }
+    ]
+  },
+  "product-inquiries": {
+    "enabled": true,
+    "submit_label": "SEND INQUIRY",
+    "success_message": "Thanks \u2014 your request has been received.",
+    "notification_email": "",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Your name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Riya Kapoor",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "email",
+        "required": true,
+        "placeholder": "you@brand.com",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "phone",
+        "label": "Phone (optional)",
+        "type": "text",
+        "required": false,
+        "placeholder": "+91 98xxxxxxxx",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "product",
+        "label": "Product interest",
+        "type": "select",
+        "required": false,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Multiple / not sure yet"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "quantity",
+        "label": "Approx. quantity",
+        "type": "text",
+        "required": false,
+        "placeholder": "e.g. 200 sqft \u00b7 40 sheets \u00b7 12 rooms",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "message",
+        "label": "Your requirement",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "Project, finishes in mind, delivery city, timeline \u2014 anything helps.",
+        "options": [],
+        "enabled": true
+      }
+    ]
+  },
+  "inquiries": {
+    "enabled": true,
+    "submit_label": "SEND INQUIRY",
+    "success_message": "Thanks \u2014 your request has been received.",
+    "notification_email": "",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Your name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Riya Kapoor",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "email",
+        "label": "Work email",
+        "type": "email",
+        "required": true,
+        "placeholder": "you@brand.com",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "company",
+        "label": "Company / Studio",
+        "type": "text",
+        "required": false,
+        "placeholder": "BDSM",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "segment",
+        "label": "What does your project need?",
+        "type": "select",
+        "required": false,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Not sure yet"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "budget",
+        "label": "Rough budget",
+        "type": "select",
+        "required": false,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Prefer not to say"
+          },
+          {
+            "value": "under-25L",
+            "label": "Under \u20b925L"
+          },
+          {
+            "value": "25L-1Cr",
+            "label": "\u20b925L \u2013 \u20b91Cr"
+          },
+          {
+            "value": "1-5Cr",
+            "label": "\u20b91Cr \u2013 \u20b95Cr"
+          },
+          {
+            "value": "5Cr-plus",
+            "label": "\u20b95Cr +"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "message",
+        "label": "Tell us about the project",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "Site, brief, materials in mind \u2014 anything helps.",
+        "options": [],
+        "enabled": true
+      }
+    ]
+  },
+  "quote-requests": {
+    "enabled": true,
+    "submit_label": "REQUEST QUOTE",
+    "success_message": "Thanks \u2014 your request has been received.",
+    "notification_email": "",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Your name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Riya Kapoor",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "phone",
+        "label": "Phone",
+        "type": "text",
+        "required": true,
+        "placeholder": "+91 98xxxxxxxx",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "email",
+        "required": true,
+        "placeholder": "you@brand.com",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "city",
+        "label": "City",
+        "type": "text",
+        "required": false,
+        "placeholder": "Jaipur",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "quantity",
+        "label": "Quantity / area",
+        "type": "text",
+        "required": false,
+        "placeholder": "e.g. 2 pieces / 450 sqft",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "timeline",
+        "label": "Needed by",
+        "type": "select",
+        "required": false,
+        "placeholder": "",
+        "options": [
+          {
+            "value": "",
+            "label": "Flexible"
+          },
+          {
+            "value": "Within 2 weeks",
+            "label": "Within 2 weeks"
+          },
+          {
+            "value": "Within 1 month",
+            "label": "Within 1 month"
+          },
+          {
+            "value": "1\u20133 months",
+            "label": "1\u20133 months"
+          },
+          {
+            "value": "3+ months",
+            "label": "3+ months"
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "name": "message",
+        "label": "Message (optional)",
+        "type": "textarea",
+        "required": false,
+        "placeholder": "Size, finish, colour or anything else about this product.",
+        "options": [],
+        "enabled": true
+      },
+      {
+        "name": "wantSample",
+        "label": "Also send me a physical sample of this product",
+        "type": "checkbox",
+        "required": false,
+        "placeholder": "",
+        "options": [],
+        "enabled": true
+      }
+    ]
+  }
+}

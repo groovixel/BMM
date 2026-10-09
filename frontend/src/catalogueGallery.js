@@ -58,6 +58,7 @@ const EXTRA_IMAGES = {
 };
 
 export function buildMaterialGallery(item, detail, img) {
+  if (Array.isArray(detail.products)) return detail.products.map((p, i) => ({ ...p, src: img(p.src, 1200), title: p.title || `${item.name} — ${i + 1}`, material: p.material || item.material || "", finish: p.finish || "", use: p.use || item.application || "" }));
   const spec = (i) => (detail.specs[i] || [])[1];
   const ids = [...new Set([...(detail.gallery || []), ...(EXTRA_IMAGES[item.slug] || [])])];
   return ids.map((id, i) => ({

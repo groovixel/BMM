@@ -47,3 +47,9 @@ Required-field validation was repaired in both React and PHP; a fresh local run 
 - Real payment collection and Google social login are not implemented in this WordPress version.
 - External image/map/font availability is outside the package.
 - Local build tooling retains Tailwind 3's transitive `braces` advisory (no patched 3.x release available in the registry checked); it processes repository-owned source only and is not deployed to the WordPress server. PostCSS and its selector parser were updated separately.
+
+## WordPress content editor 3.0.0
+
+The production build passed. The original 48 API/route checks passed with native content enabled. A separate disposable-local suite passed 19 CMS assertions: authenticated editor access; anonymous write denial; project create, edit, publish and draft behavior; stay price/capacity/gallery edits; authoritative checkout pricing/capacity; removal of all products from a collection; custom required form fields and saved values; disabled form rejection; seed idempotence; new shortcode forms and their submissions; hiding site sections without hardcoded fallback. Two additional targeted checks passed for mandatory form identity fields and correct display of WordPress title entities.
+
+Chrome UI verification confirmed the native project editor saves its metadata, including ₹ and Unicode, and the project page displays the change. The Text & links editor saved a homepage headline replacement and the homepage displayed it. Test mail is intercepted on localhost. CMS test command: `BDS_TEST_URL=http://127.0.0.1:9405 python3 wordpress/tests/test_editable.py`. Use only the disposable local fixture.

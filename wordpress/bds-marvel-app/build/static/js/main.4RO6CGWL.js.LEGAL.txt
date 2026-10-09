@@ -55,12 +55,6 @@ react/cjs/react-jsx-runtime.production.js:
    * LICENSE file in the root directory of this source tree.
    */
 
-leaflet/dist/leaflet-src.js:
-  /* @preserve
-   * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
-   * (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
-   */
-
 lucide-react/dist/esm/shared/src/utils.js:
 lucide-react/dist/esm/defaultAttributes.js:
 lucide-react/dist/esm/Icon.js:
@@ -132,4 +126,22 @@ react-router/dist/development/index.mjs:
    * LICENSE.md file in the root directory of this source tree.
    *
    * @license MIT
+   */
+
+react-router-dom/dist/index.mjs:
+  /**
+   * react-router-dom v7.18.2
+   *
+   * Copyright (c) Remix Software Inc.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE.md file in the root directory of this source tree.
+   *
+   * @license MIT
+   */
+
+leaflet/dist/leaflet-src.js:
+  /* @preserve
+   * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
+   * (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
    */
