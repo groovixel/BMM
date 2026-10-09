@@ -1,3 +1,4 @@
+import { apiFetch, apiPath, publicAsset } from "./wordpress";
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from "react";
 import { ArrowDown, ArrowUp, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight, Facebook, Instagram, Linkedin, Loader2, Search, Twitter, User, X, Youtube } from "lucide-react";
 import { BrowserRouter, HashRouter, Link, Navigate, Route, Routes, useLocation, useNavigate, useNavigationType, useParams } from "react-router-dom";
@@ -11,9 +12,7 @@ import { buildMaterialGallery } from "@/catalogueGallery";
 
 const IMG = "https://images.unsplash.com/";
 const img = (id, w = 1600) => id.startsWith("http") ? id : `${IMG}${id}?auto=format&fit=crop&w=${w}&q=80`;
-const publicAsset = (path) => `${process.env.PUBLIC_URL || ""}${path}`;
-const apiBaseUrl = process.env.REACT_APP_BACKEND_URL || "";
-const Router = process.env.REACT_APP_WORDPRESS_MODE === "true" ? HashRouter : BrowserRouter;
+const Router = (window.BDS_WORDPRESS?.routerMode || (process.env.REACT_APP_WORDPRESS_MODE === "true" ? "hash" : "browser")) === "hash" ? HashRouter : BrowserRouter;
 
 // Scroll position per history entry (for back/forward scroll restoration)
 const scrollPositions = new Map();
@@ -967,12 +966,12 @@ function ConsultationModal() {
       if (file) {
         const fd = new FormData();
         fd.append("file", file);
-        const up = await fetch(`${apiBaseUrl}/api/consultations/upload`, { method: "POST", body: fd });
+        const up = await apiFetch(apiPath(`/consultations/upload`), { method: "POST", body: fd });
         if (!up.ok) throw new Error("We couldn't upload that file. Try a smaller image or remove it.");
         const upData = await up.json();
         fileId = upData.id; fileName = upData.filename;
       }
-      const response = await fetch(`${apiBaseUrl}/api/consultations`, {
+      const response = await apiFetch(apiPath(`/consultations`), {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(),
@@ -984,7 +983,7 @@ function ConsultationModal() {
       });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
-        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || "Please double-check your details and try again.");
+        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || detail?.message || "Please double-check your details and try again.");
       }
       setStatus({ state: "sent", error: "" });
       setForm(empty); setFile(null);
@@ -1053,7 +1052,7 @@ function SampleModal() {
     event.preventDefault();
     setStatus({ state: "sending", error: "" });
     try {
-      const response = await fetch(`${apiBaseUrl}/api/sample-requests`, {
+      const response = await apiFetch(apiPath(`/sample-requests`), {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           product, brand: brand || null,
@@ -1064,7 +1063,7 @@ function SampleModal() {
       });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
-        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || "Please double-check your details and try again.");
+        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || detail?.message || "Please double-check your details and try again.");
       }
       setStatus({ state: "sent", error: "" });
       setForm(empty);
@@ -1134,7 +1133,7 @@ function InquiryModal() {
     event.preventDefault();
     setStatus({ state: "sending", error: "" });
     try {
-      const response = await fetch(`${apiBaseUrl}/api/product-inquiries`, {
+      const response = await apiFetch(apiPath(`/product-inquiries`), {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() || null,
@@ -1144,7 +1143,7 @@ function InquiryModal() {
       });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
-        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || "Please double-check your details and try again.");
+        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || detail?.message || "Please double-check your details and try again.");
       }
       setStatus({ state: "sent", error: "" });
       setForm(empty);
@@ -1207,7 +1206,7 @@ function ContactModal() {
     event.preventDefault();
     setStatus({ state: "sending", error: "" });
     try {
-      const response = await fetch(`${apiBaseUrl}/api/inquiries`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), company: form.company.trim() || null, agency: form.segment || null, budget: form.budget || null, message: form.message.trim() }) });
+      const response = await apiFetch(apiPath(`/inquiries`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), company: form.company.trim() || null, agency: form.segment || null, budget: form.budget || null, message: form.message.trim() }) });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
         throw new Error(detail?.detail?.[0]?.msg || "Please double-check your details and try again.");
@@ -1435,7 +1434,7 @@ function ProductQuoteModal({ open, onClose, details }) {
     event.preventDefault();
     setStatus({ state: "sending", error: "" });
     try {
-      const response = await fetch(`${apiBaseUrl}/api/quote-requests`, {
+      const response = await apiFetch(apiPath(`/quote-requests`), {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           product: details.product, collection: details.collection, brand: details.brand, material: details.material,
@@ -1446,7 +1445,7 @@ function ProductQuoteModal({ open, onClose, details }) {
       });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
-        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || "Please double-check your details and try again.");
+        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || detail?.message || "Please double-check your details and try again.");
       }
       setStatus({ state: "sent", error: "" });
     } catch (error) {
@@ -1652,7 +1651,7 @@ function BookingModal({ stay, onClose }) {
     if (open) {
       setStatus({ state: "idle", error: "" });
       setForm({ name: "", email: "", checkIn: "", checkOut: "", guests: "2", message: "" });
-      fetch(`${apiBaseUrl}/api/stays/availability?stay=${encodeURIComponent(stay.name)}`)
+      apiFetch(apiPath(`/stays/availability?stay=${encodeURIComponent(stay.name)}`))
         .then((res) => (res.ok ? res.json() : { booked: [], requested: [] }))
         .then((data) => { setBooked(data.booked || []); setPending(data.requested || []); })
         .catch(() => { setBooked([]); setPending([]); });
@@ -1683,7 +1682,7 @@ function BookingModal({ stay, onClose }) {
     }
     setStatus({ state: "sending", error: "" });
     try {
-      const response = await fetch(`${apiBaseUrl}/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ stay: stay.name, name: form.name.trim(), email: form.email.trim(), check_in: form.checkIn, check_out: form.checkOut, guests: Number(form.guests), message: form.message.trim() || null }) });
+      const response = await apiFetch(apiPath(`/bookings`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ stay: stay.name, name: form.name.trim(), email: form.email.trim(), check_in: form.checkIn, check_out: form.checkOut, guests: Number(form.guests), message: form.message.trim() || null }) });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
         const message = typeof detail?.detail === "string" ? detail.detail : detail?.detail?.[0]?.msg;
@@ -1986,7 +1985,7 @@ function AppRoutes() {
 }
 
 function App() {
-  return <Router>
+  return <Router basename={window.BDS_WORDPRESS?.routerMode === "browser" ? window.BDS_WORDPRESS.basename : undefined}>
     <AuthProvider>
     <StaysProvider>
     <ContactProvider>

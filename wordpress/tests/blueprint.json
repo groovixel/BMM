@@ -1,0 +1,28 @@
+{
+  "steps": [
+    {
+      "step": "writeFile",
+      "path": "/wordpress/wp-content/mu-plugins/bds-test-mail.php",
+      "data": "<?php add_filter('pre_wp_mail', function(){ return true; });"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "bds-marvel-app/bds-marvel-app.php"
+    },
+    {
+      "step": "activateTheme",
+      "themeFolderName": "bds-marvel-theme"
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "blogname": "BDS Marvel",
+        "permalink_structure": "/%postname%/"
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require '/wordpress/wp-load.php'; wp_update_user(['ID'=>1,'user_email'=>'owner@example.test']); wp_set_password('bds-test-owner-pass',1); flush_rewrite_rules();"
+    }
+  ]
+}

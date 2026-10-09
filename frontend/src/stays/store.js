@@ -1,6 +1,6 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useState } from "react";
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import { apiFetch, apiPath } from "../wordpress";
 
 export function formatApiError(detail) {
   if (detail == null) return "Something went wrong. Please try again.";
@@ -11,9 +11,9 @@ export function formatApiError(detail) {
 }
 
 export async function api(path, { method = "GET", body } = {}) {
-  const res = await fetch(`${API}/api${path}`, { method, credentials: "include", headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined });
+  const res = await apiFetch(apiPath(path), { method, credentials: "include", headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) { const err = new Error(formatApiError(data.detail)); err.status = res.status; throw err; }
+  if (!res.ok) { const err = new Error(formatApiError(data.detail || data.message)); err.status = res.status; throw err; }
   return data;
 }
 
@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
     if (window.location.hash?.includes("session_id=")) { setUser(false); return; }
     check();
   }, [check]);
-  const logout = useCallback(async () => { await api("/auth/logout", { method: "POST" }).catch(() => {}); setUser(false); }, []);
+  const logout = useCallback(async () => { await api("/auth/logout", { method: "POST" }).catch(() => {}); if (window.BDS_WORDPRESS) window.BDS_WORDPRESS.nonce = ""; setUser(false); }, []);
   return createElement(AuthCtx.Provider, { value: { user, setUser, logout, check } }, children);
 }
 export const useAuth = () => useContext(AuthCtx);

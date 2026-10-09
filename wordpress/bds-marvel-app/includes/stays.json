@@ -1,0 +1,92 @@
+[
+  {
+    "slug": "living-studio",
+    "name": "The Living Studio",
+    "guests": 6,
+    "nightly": 28000
+  },
+  {
+    "slug": "stone-pavilion",
+    "name": "The Stone Pavilion",
+    "guests": 8,
+    "nightly": 32000
+  },
+  {
+    "slug": "marble-house",
+    "name": "The Marble House",
+    "guests": 6,
+    "nightly": 30000
+  },
+  {
+    "slug": "verandah-suite",
+    "name": "The Verandah Suite",
+    "guests": 4,
+    "nightly": 24000
+  },
+  {
+    "slug": "atelier-penthouse",
+    "name": "The BDS Penthouse",
+    "guests": 6,
+    "nightly": 36000
+  },
+  {
+    "slug": "material-loft",
+    "name": "The Material Loft",
+    "guests": 4,
+    "nightly": 12500
+  },
+  {
+    "slug": "oak-apartment",
+    "name": "The Oak Apartment",
+    "guests": 4,
+    "nightly": 10500
+  },
+  {
+    "slug": "kota-flat",
+    "name": "The Kota Flat",
+    "guests": 3,
+    "nightly": 9800
+  },
+  {
+    "slug": "terrace-rooms",
+    "name": "The Terrace Rooms",
+    "guests": 4,
+    "nightly": 11200
+  },
+  {
+    "slug": "weavers-stay",
+    "name": "The Weaver's Stay",
+    "guests": 3,
+    "nightly": 9500
+  },
+  {
+    "slug": "courtyard-room",
+    "name": "The Courtyard Room",
+    "guests": 2,
+    "nightly": 5800
+  },
+  {
+    "slug": "studio-nook",
+    "name": "The Studio Nook",
+    "guests": 2,
+    "nightly": 3900
+  },
+  {
+    "slug": "workshop-room",
+    "name": "The Workshop Room",
+    "guests": 2,
+    "nightly": 4200
+  },
+  {
+    "slug": "sunroom",
+    "name": "The Sunroom",
+    "guests": 2,
+    "nightly": 4600
+  },
+  {
+    "slug": "lime-wash-room",
+    "name": "The Lime Wash Room",
+    "guests": 2,
+    "nightly": 4900
+  }
+]

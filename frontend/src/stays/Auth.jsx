@@ -1,3 +1,4 @@
+import { nativeWordPress } from "../wordpress";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
@@ -39,8 +40,9 @@ export function AuthPanel({ onDone, returnTo }) {
       {status.error && <p className="sx-error" role="alert" data-testid="auth-error">{status.error}</p>}
       <button type="submit" className="sx-btn sx-btn--primary sx-btn--block" disabled={status.busy} data-testid="auth-submit">{status.busy ? <Loader2 size={16} className="sx-spin" /> : null}{tab === "login" ? "Continue" : "Create account"}</button>
     </form>
-    <div className="sx-or"><span>or</span></div>
-    <button type="button" className="sx-btn sx-btn--outline sx-btn--block" onClick={google} data-testid="auth-google"><GoogleMark /> Continue with Google</button>
+    {nativeWordPress && <a className="sx-link" href={window.BDS_WORDPRESS.passwordResetUrl}>Forgot your password?</a>}
+    {!nativeWordPress && <div className="sx-or"><span>or</span></div>}
+    {!nativeWordPress && <button type="button" className="sx-btn sx-btn--outline sx-btn--block" onClick={google} data-testid="auth-google"><GoogleMark /> Continue with Google</button>}
     <p className="sx-note">Your trip details are saved — you'll come straight back to this step.</p>
   </div>;
 }

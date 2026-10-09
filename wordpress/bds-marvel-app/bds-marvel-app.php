@@ -1,71 +1,52 @@
 <?php
 /**
  * Plugin Name: BDS Marvel App
- * Description: Embeds the BDS Marvel (BDSM) React application into any WordPress page/post via the [bds_marvel_app] shortcode. The whole single-page app runs inside one WordPress page using HashRouter.
- * Version: 1.0.0
+ * Description: BDS Marvel design, WordPress guest accounts, bookings, private enquiries and owner dashboard. Use [bds_marvel_app] or the companion theme.
+ * Version: 2.0.0
+ * Requires at least: 6.5
+ * Requires PHP: 7.4
  * Author: BDS Marvel
+ * License: GPL-2.0-or-later
  */
-
 if (!defined('ABSPATH')) { exit; }
-
 define('BDSM_APP_DIR', plugin_dir_path(__FILE__));
 define('BDSM_APP_URL', plugin_dir_url(__FILE__));
-define('BDSM_APP_BUILD_DIR', BDSM_APP_DIR . 'build/');
-define('BDSM_APP_BUILD_URL', BDSM_APP_URL . 'build/');
+require_once BDSM_APP_DIR . 'includes/api.php';
+require_once BDSM_APP_DIR . 'includes/admin.php';
+register_activation_hook(__FILE__, 'bds_install');
 
-/**
- * Read the CRA asset-manifest.json produced by `yarn build`.
- */
-function bdsm_app_manifest() {
-    $manifest_path = BDSM_APP_BUILD_DIR . 'asset-manifest.json';
-    if (!file_exists($manifest_path)) { return null; }
-    $json = file_get_contents($manifest_path);
-    return json_decode($json, true);
-}
-
-/**
- * Register every entrypoint (runtime + main js/css) with correct absolute URLs.
- * Assets are served from this plugin's build/ folder, so they work on any domain.
- */
-function bdsm_app_register_assets() {
-    $manifest = bdsm_app_manifest();
-    if (!$manifest || empty($manifest['entrypoints'])) { return; }
-
-    $css_handles = array();
-    $js_handles  = array();
-    $i = 0;
-    foreach ($manifest['entrypoints'] as $file) {
-        $url = BDSM_APP_BUILD_URL . ltrim($file, '/');
-        if (substr($file, -4) === '.css') {
-            $handle = 'bdsm-app-css-' . $i;
-            wp_register_style($handle, $url, array(), null);
-            $css_handles[] = $handle;
-        } elseif (substr($file, -3) === '.js') {
+function bdsm_app_enqueue($mode = 'hash') {
+    static $loaded = false;
+    if ($loaded) { return; }
+    $loaded = true;
+    $manifest = json_decode(file_get_contents(BDSM_APP_DIR . 'build/asset-manifest.json'), true);
+    $previous = array();
+    foreach ($manifest['entrypoints'] ?? array() as $i => $file) {
+        if (!preg_match('#^static/(js|css)/[a-zA-Z0-9._/-]+\.(js|css)$#', $file) || strpos($file, '..') !== false) { continue; }
+        $url = BDSM_APP_URL . 'build/' . $file;
+        if (substr($file, -4) === '.css') { wp_enqueue_style('bdsm-app-css-' . $i, $url, array(), '2.0.0'); }
+        if (substr($file, -3) === '.js') {
             $handle = 'bdsm-app-js-' . $i;
-            // in_footer = true so the mount node exists before the app boots
-            wp_register_script($handle, $url, array(), null, true);
-            $js_handles[] = $handle;
+            wp_enqueue_script($handle, $url, $previous, '2.0.0', true);
+            if (!$previous) {
+                $config = array('apiUrl' => untrailingslashit(rest_url('bds/v1')), 'assetUrl' => BDSM_APP_URL . 'build',
+                    'native' => true, 'routerMode' => $mode, 'basename' => wp_parse_url(home_url('/'), PHP_URL_PATH),
+                    'passwordResetUrl' => wp_lostpassword_url(),
+                    'nonce' => is_user_logged_in() ? wp_create_nonce('wp_rest') : '');
+                wp_add_inline_script($handle, 'window.BDS_WORDPRESS = ' . wp_json_encode($config) . ';', 'before');
+            }
+            $previous[] = $handle;
         }
-        $i++;
     }
-    $GLOBALS['bdsm_app_css_handles'] = $css_handles;
-    $GLOBALS['bdsm_app_js_handles']  = $js_handles;
+    wp_enqueue_style('bdsm-app-fonts', 'https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap', array(), null);
 }
-add_action('wp_enqueue_scripts', 'bdsm_app_register_assets');
-
-/**
- * [bds_marvel_app] — outputs the mount node and enqueues the bundle only on
- * pages that actually use the shortcode.
- */
-function bdsm_app_shortcode($atts) {
-    if (empty($GLOBALS['bdsm_app_js_handles'])) {
-        return '<div style="padding:24px;font-family:sans-serif;border:1px solid #ddd;border-radius:8px">'
-             . '<strong>BDS Marvel app build not found.</strong><br>'
-             . 'Build the React app for WordPress and upload its <code>build/</code> folder into '
-             . '<code>wp-content/plugins/bds-marvel-app/build/</code>.</div>';
-    }
-    foreach ($GLOBALS['bdsm_app_css_handles'] as $h) { wp_enqueue_style($h); }
-    foreach ($GLOBALS['bdsm_app_js_handles'] as $h) { wp_enqueue_script($h); }
-    return '<div id="bdsm-marvel-root"></div>';
-}
-add_shortcode('bds_marvel_app', 'bdsm_app_shortcode');
+add_action('wp_enqueue_scripts', function () {
+    if (is_singular() && has_shortcode(get_post()->post_content, 'bds_marvel_app')) { bdsm_app_enqueue(); }
+});
+add_shortcode('bds_marvel_app', function () {
+    bdsm_app_enqueue();
+    static $rendered = false;
+    if ($rendered) { return ''; }
+    $rendered = true;
+    return '<div id="bdsm-marvel-root"></div><noscript>Please enable JavaScript to browse BDS Marvel and book a stay.</noscript>';
+});

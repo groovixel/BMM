@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://github-import-161.preview.emergentagent.com/sitemap.xml
