@@ -1109,6 +1109,16 @@ a.svc-cat-card{color:inherit;text-decoration:none}
   background: linear-gradient(140deg, rgba(255,255,255,.45) 0%, rgba(255,255,255,.08) 38%, rgba(255,255,255,0) 60%);
 }
 
+/* Remove liquid glass effect from the "Request a Night" hero CTA */
+[data-testid="experience-book-cta"] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+[data-testid="experience-book-cta"]::after {
+  display: none;
+}
+
+
 /* Primary CTAs — dark liquid glass */
 .np-btn {
   background: rgba(13,11,9,.5);
