@@ -1986,7 +1986,7 @@ function AppRoutes() {
 }
 
 function App() {
-  return <BrowserRouter>
+  return <Router>
     <AuthProvider>
     <StaysProvider>
     <ContactProvider>
@@ -2000,7 +2000,7 @@ function App() {
     </ContactProvider>
     </StaysProvider>
     </AuthProvider>
-  </BrowserRouter>;
+  </Router>;
 }
 
 export default App;

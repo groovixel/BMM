@@ -42,6 +42,15 @@ Run & verify in preview only (no live publish).
 - No secrets in source; `.env` only; `.env` gitignored.
 - App runs in preview: frontend + backend + Mongo. Admin login works. Stop at preview.
 
+## WordPress Embed (2026-06)
+- Goal: run the whole React app inside one WordPress page (HashRouter embed). FastAPI/Mongo backend unchanged.
+- Fixed dormant switch: `App()` JSX now uses env-driven `Router` (was hardcoded `<BrowserRouter>`). `REACT_APP_WORDPRESS_MODE=true` → HashRouter; unset (preview) → BrowserRouter.
+- `index.js` mounts into `#bdsm-marvel-root` (fallback `#root`).
+- Build: `scripts/build-wordpress.sh` (sets `REACT_APP_WORDPRESS_MODE=true`, `INLINE_RUNTIME_CHUNK=false`, bakes `REACT_APP_BACKEND_URL`).
+- Plugin: `wordpress/bds-marvel-app/` — `bds-marvel-app.php` reads CRA `asset-manifest.json` entrypoints, enqueues JS/CSS, registers `[bds_marvel_app]` shortcode. Build copied into plugin `build/`.
+- Docs: `wordpress/README.md` (build + install + CORS steps). For a real WP domain, add it to backend `CORS_ORIGINS` and rebuild with the deployed backend URL.
+- NOT click-through tested inside a live WordPress instance (none available here); bundle compiles clean, is self-contained, env baked, switch wired.
+
 ## Backlog / Open
 - P1: If user wants to point at their own MongoDB, swap MONGO_URL/DB_NAME and re-seed.
 - P2: Live publish/deploy (currently preview-only per user choice).
