@@ -1,0 +1,31 @@
+{
+  "summary": "Verified CSS z-index fix for mobile stay detail page: Leaflet map +/- zoom controls stacked below the sticky Reserve bar. Also validated desktop regression (zoom controls work, no mobile booking bar).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Fix is minimal and scoped correctly to .sx-dmap so it does not impact the stays listing map (.sx-map). Good targeting.",
+    "Reserve bar z-index:600 > zoom controls z-index:500 confirmed via computed styles."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Mobile stacking fix verified at 390x760. Reserve bar sits above Leaflet zoom controls (bar z=600, .sx-dmap .leaflet-top/.leaflet-bottom z=500). Reserve button is topmost element at its center point (confirmed via elementFromPoint). Button is clickable and opens 'Your trip' modal. Desktop 1280x800: mobile-booking-bar hidden, book-this-stay sticky card visible, map zoom +/- clickable.",
+  "test_evidence": {
+    "mobile_bar_z_index": "600",
+    "mobile_zoom_container_z_index": "500",
+    "reserve_center_element": "BUTTON data-testid=mobile-reserve",
+    "reserve_click": "success - opens Your trip modal",
+    "desktop_zoom_in_click": "success",
+    "desktop_zoom_out_click": "success",
+    "desktop_mobile_bar_visible": false,
+    "desktop_book_this_stay_present": true
+  }
+}
