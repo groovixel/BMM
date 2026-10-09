@@ -427,7 +427,7 @@ function Header() {
       </nav>
       {(onStays || user === false) && <div className="drawer-account" data-testid="drawer-account">
         {user === false && <>
-          <Link to="/stays/account" state={(location.pathname.startsWith("/stays/home") || location.pathname.startsWith("/stays/book")) ? { from: location.pathname + location.search } : undefined} onClick={() => setMenuOpen(false)} data-testid="drawer-signin-link">SIGN IN</Link>
+          <Link to="/stays/account" state={(location.pathname.startsWith("/stays/home") || location.pathname.startsWith("/stays/book")) ? { from: location.pathname + location.search } : undefined} onClick={() => setMenuOpen(false)} data-testid="drawer-signin-link">BnB SIGN IN</Link>
           {onStays && <>
             <span className="drawer-account__dot">·</span>
             <Link to="/stays" onClick={() => setMenuOpen(false)} data-testid="drawer-stays-link">STAYS</Link>
