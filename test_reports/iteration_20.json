@@ -1,0 +1,30 @@
+{
+  "summary": "Broad regression sweep across all top-level routes + recent navigation/UI edits. All 8 routes load without errors. Nav drawer AIR BNB → /stays, drawer BnB SIGN IN → /stays/account, footer air-bnb → /stays, footer has Instagram only (no LinkedIn). Homepage spotlight: EXPLORE THE STAY → /stays?start=where ✓, REQUEST A NIGHT → /experience ✓. Contact accordion: expands/collapses correctly, Get in Touch opens modal. Mobile booking bar: visible mid-page, slides down (translateY 79.2px + sx-mbar--hidden class) when footer intersects, re-appears on scroll back up. Reserve button opens booking sheet. Desktop shows book-this-stay card, hides mobile bar. Projects filter is a native rounded SELECT with 7 options. Backend: 4/4 pytest regression tests pass (/api/, admin login, /api/auth/me, /api/stays/availability).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Experience hero CTA (mobile)", "issues": ["Font-size is 11px on both desktop and mobile — requirement says ~10% smaller on mobile. Padding is slightly reduced on mobile (14px/22px) which may suffice visually, but the font-size itself is unchanged. Confirm this meets the design intent; otherwise reduce font-size (e.g. 10px) or overall scale at <=600px."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_regression_iter20.py",
+    "/app/test_reports/pytest/iter20_regression.xml"
+  ],
+  "action_items": [
+    "Optional: verify intent of 'Experience CTA ~10% smaller on mobile'. Current padding is reduced on mobile but font-size (11px) is identical to desktop. If a smaller visual is required, drop font-size to ~10px at <=600px."
+  ],
+  "critical_code_review_comments": [
+    "footer-link-bnb is a <button> (no href) — navigation works via onClick/useNavigate and lands on /stays correctly. Behavior is fine, but using <a href='/stays'> would be more semantic / SSR-friendly / middle-click friendly.",
+    "Mobile booking bar hide uses an IntersectionObserver on .site-footer plus a CSS transform — behavior verified at 390px: transform matrix(1,0,0,1,0,79.2) applied with class sx-mbar--hidden. Clean implementation.",
+    "Contact city buttons expose aria-expanded correctly, which is good for a11y. Modal opens on 'Get in Touch'."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "~98% (all critical flows pass; one minor design question on CTA mobile sizing)"},
+  "test_credentials": "Admin: info@bdsmarvel.com / hPrJt0tgYZg7chAg2CgDAa1! (used, works)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "iter20 confirms recent routing swaps: nav drawer AIR BNB → /stays, drawer sign-in → /stays/account, footer air-bnb (button) → /stays, footer only Instagram (no LinkedIn). Homepage Air BnB spotlight: explore → /stays?start=where, request → /experience. Contact page accordion works and Get in Touch opens modal. Mobile booking bar hides via sx-mbar--hidden when footer intersects at 390px viewport; desktop (>=901px) shows book-this-stay side card and hides mobile bar. Backend admin login + /api/auth/me + /api/stays/availability all healthy. One minor open question: experience-book-cta mobile sizing — padding reduced but font-size unchanged at 11px."
+}
