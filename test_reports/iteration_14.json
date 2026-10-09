@@ -1,0 +1,48 @@
+{
+  "summary": "Security-audit regression: 24/25 pytest cases passing against live preview URL. Covered admin credential rotation, auth (register min-8 pwd/login/me/status/logout), stays booking + my-trips, public forms (inquiry/product/sample), upload magic-byte + extension enforcement with 401 anon & admin-only Content-Disposition download, same-origin vs Origin:evil.com guard (POST=403, GET has no ACAO echo), security headers (X-Frame-Options DENY, HSTS, nosniff, Referrer-Policy), removed /api/status endpoints (404), public form rate-limit (5/hr -> 429), and no secrets in /static/js/bundle.js. Owner dashboard UI loaded for admin and showed real pending booking + 14 enquiries. One real security bug found: login brute-force lockout never triggers (5 wrong attempts stayed at 401).",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "/api/auth/login", "issue": "Brute-force lockout at line 848 keys the per-identifier counter on request.client.host, which is the Kubernetes pod/ingress IP and rotates between multiple hops (observed 10.231.129.156 and 10.231.129.157 for the same client). As a result the counter is split across identifiers and never reaches the 5-attempt threshold, so 429 is never returned and the admin account cannot be locked out from a single real client. Use the existing _client_ip() helper (which already parses X-Forwarded-For) for the login identifier, matching how the public rate_limit dependency works. Backend-wide dependency rate_limit('login', max_requests=30) also uses _client_ip and is fine; it's only the per-account+IP identifier that is broken.", "priority": "HIGH"}
+    ],
+    "minor": []
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verifications_passed": [
+    "Old admin password Admin@123 rejected (401), new ADMIN_PASSWORD from .env returns role=admin",
+    "Owner dashboard /owner loaded with pending/upcoming/enquiries counts after admin login (cookie-based)",
+    "Guest register rejects password < 8 chars with API 422 (frontend also enforces min 8 at Auth.jsx L22)",
+    "Register -> cookie -> /auth/me 200 -> /auth/status 200 with user -> logout clears cookies -> login again 200",
+    "POST /api/stays/bookings as logged-in guest -> 201 and appears in /api/stays/bookings/mine",
+    "Public forms: /inquiries 201, /product-inquiries 201, /sample-requests 201 (require_fields enforced by Pydantic)",
+    "Upload rejects fake PNG (text with .png) and .exe with 415; accepts real PNG + PDF (magic bytes match)",
+    "GET /api/files/{id} returns 401 anonymous; 200 for admin with Content-Disposition: attachment and X-Content-Type-Options: nosniff",
+    "POST with Origin: https://evil.com -> 403 'Origin not allowed'; same-origin POST -> 201",
+    "GET with Origin: https://evil.com returns no Access-Control-Allow-Origin echo (CORSMiddleware refuses to echo unknown origins)",
+    "Security headers present on API responses: X-Frame-Options DENY, HSTS max-age=31536000, X-Content-Type-Options nosniff, Referrer-Policy strict-origin-when-cross-origin",
+    "/api/status GET and POST return 404 (route removed)",
+    "Public form rate-limit: 6th /inquiries submission within an hour returns 429",
+    "Frontend bundle /static/js/bundle.js does NOT contain EMERGENT_EMAIL_KEY, EMERGENT_LLM_KEY, JWT_SECRET, or ADMIN_PASSWORD values",
+    "Admin password hash in DB verifies with bcrypt and starts with $2b$ (seed_admin updates existing admin when password changed)"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_security_audit.py",
+    "/app/test_reports/pytest/iter14_security.xml"
+  ],
+  "action_items": [
+    "FIX brute-force lockout: in server.py around L848 replace `identifier = f\"{request.client.host...}:{email}\"` with `identifier = f\"{_client_ip(request)}:{email}\"` so the counter keys on the real forwarded client IP, not the rotating ingress hop IP. Verified by running 6 bad logins -> all returned 401 even though DB rows showed count=5 against each separate pod-IP identifier."
+  ],
+  "critical_code_review_comments": [
+    "server.py L848 uses request.client.host instead of the already-defined _client_ip() helper, defeating brute-force protection behind the Kubernetes ingress.",
+    "server.py is 1185 lines in one file; consider splitting into routers (auth, stays, admin, inquiries, uploads) for maintainability.",
+    "login_attempts entries are never cleaned up when the lockout window expires; a background sweeper or TTL index on identifier/locked_until would prevent unbounded growth.",
+    "rate_limit uses an in-memory defaultdict(deque); works on single-process but will reset on backend restart and won't be shared across replicas - documented in request note, worth flagging for prod."
+  ],
+  "updated_files": ["/app/backend/tests/test_security_audit.py"],
+  "success_rate": {"backend": "96% (24/25 pytest)", "frontend": "100% (home + /owner admin dashboard load with no errors)"},
+  "test_credentials": "admin@bdsmarvel.com / <redacted> (loaded from backend/.env)",
+  "seed_data_creation": "Created a few TEST_ inquiry/product-inquiry/sample-request/consultation-upload/stays-booking rows during tests. Backend restarted twice to clear in-memory rate buckets.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "test_security_audit.py is the single consolidated regression file. If running after a backend restart it is clean; otherwise the per-IP rate-limit test at the end will produce 429s on subsequent runs until the next backend restart. The login brute-force test will keep failing until the identifier is switched to use _client_ip().",
+  "rca of the issue": "RCA (brute-force lockout not triggering): server.py line 848 builds the login_attempts identifier from request.client.host. Behind the Kubernetes ingress + preview reverse proxy, request.client.host is the proxy hop address and rotates among at least two pod IPs (observed 10.231.129.156 and 10.231.129.157 for the same external test client). Each hop writes to its own identifier, so the per-identifier count never reaches 5. The database rows during the test show two separate records 10.231.129.156:<email> count=1 and 10.231.129.157:<email> count=5 but with locked_until set, yet the next attempt was load-balanced back to 10.231.129.156 where the counter was still below the threshold. Reproduce: POST /api/auth/login with a valid email and wrong password 6 times in quick succession - all responses are 401 instead of 429 on the 6th. Mitigation: swap request.client.host for the existing _client_ip(request) helper (reads x-forwarded-for first hop) so the identifier is stable per real client; the public rate_limit dependency already uses this and works correctly."
+}

@@ -1,0 +1,27 @@
+{
+  "summary": "Verified bug fix for /stays vertical scroll getting blocked over horizontal row tracks (sx-row__track with data-hscroll). The new Lenis virtualScroll filter in /app/frontend/src/lib/smoothScroll.js (returns false — i.e., native handling — only when |deltaX| > 1.5*|deltaY| AND target is inside [data-hscroll]) correctly lets vertical wheel over the rows scroll the page via Lenis, while handing clearly-sideways gestures to native. Primary bug is fixed. Regression tests on /, /catalogue, /stays/search filterbar, and mobile 390x844 also pass.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/stays rows (desktop >=1280px)", "issues": ["Row tracks (.sx-row__track) do not actually horizontally overflow at 1280px and 1920px — scrollWidth === clientWidth for row-premium / row-mid / row-budget-friendly. As a result, horizontal wheel over the row and the row-{slug}-left/right arrow buttons visually do nothing at these breakpoints (CSS layout fits all cards). Not a regression from the scroll fix, but worth confirming if arrows/horizontal gesture are expected to be meaningful on desktop. Arrows do work on narrower / mobile widths where overflow exists."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: review .sx-row__track CSS so cards actually overflow horizontally on desktop (otherwise row arrow buttons and horizontal wheel are no-ops at common desktop widths). Not blocking — the user-reported bug (vertical scroll stuck over rows) is fixed."
+  ],
+  "critical_code_review_comments": [
+    "smoothScroll.js virtualScroll callback is clean and correctly scoped via closest('[data-hscroll]'); shortcut arrow-fn return expression is readable. Good: no data-lenis-prevent* leftover.",
+    "Lenis instance remains cached in module scope; initSmoothScroll is idempotent — safe.",
+    "Mobile correctly skips Lenis (useragent-independent, uses max-width:900px media query) — no horizontal overflow observed at 390x844."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped per request)", "frontend": "100% on primary bug and regression suite"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Tested at desktop 1920x800, desktop 1280x800 and mobile 390x844. Confirmed: (1) wheel(0,120) over [data-testid=row-premium] .sx-row__track scrolls window.scrollY from 0 to ~716 — bug fixed; (2) wheel(0,-120) over row-mid scrolls up; (3) diagonal wheel(20,100) over row-budget-friendly scrolls page; (4) filterbar on /stays/search (data-hscroll) allows vertical page scroll; (5) / and /catalogue vertical scroll unaffected; (6) mobile: window.__smoothScroll is null (Lenis off), no horizontal body overflow, wheel(0,120) scrolls page. Rows don't actually overflow horizontally at 1280/1920 widths (scrollWidth===clientWidth) so sideways-wheel-scrolls-row-horizontally couldn't be behaviourally confirmed — this is a CSS/layout note, not a bug in the Lenis change.",
+  "rca of the issue": "Previous implementations used data-lenis-prevent / data-lenis-prevent-horizontal on .sx-row__track, which prevented Lenis from handling any wheel event whose target was inside the track — including vertical wheel. Result: vertical page scrolling appeared to stop whenever the cursor hovered the row. Fix replaced the attribute-based prevention with a Lenis virtualScroll filter that only returns false (native) for clearly-sideways gestures (|deltaX| > 1.5*|deltaY|) over [data-hscroll]; otherwise Lenis handles the event and the page scrolls. Verified via Playwright on preview URL."
+}

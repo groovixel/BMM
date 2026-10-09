@@ -1,0 +1,30 @@
+{
+  "summary": "Retest of iteration_14's single failing bug (brute-force lockout) plus quick regression. Fix applied in server.py L848 - identifier now uses _client_ip(request) instead of request.client.host. Verified end-to-end: 5x 401 then 429 on 6th and 7th attempt against the preview URL using a throwaway email. Admin login still succeeds afterward. Guest register/login/me/logout regression passes. Contact inquiry form submits successfully from the UI (POST /api/inquiries -> 201, 'Thanks' confirmation shown).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verifications_passed": [
+    "Brute-force lockout: wrong-password sequence for throwaway bf2_* email returned [401,401,401,401,401,429,429] - lockout triggers on the 6th attempt as expected (previously all stayed 401 due to rotating ingress hop IP)",
+    "Admin login (admin@bdsmarvel.com) succeeds with 200 and role=admin immediately after the throwaway brute-force run - admin account is NOT impacted by the throwaway lockout (per-identifier is {ip}:{email})",
+    "Guest register -> /auth/me via cookie -> /auth/status -> logout -> re-login all pass (test_register_login_me_logout green)",
+    "Password-too-short registration still rejected with 422",
+    "Contact inquiry form (/contact -> Get in Touch modal) submits successfully: POST /api/inquiries -> 201, UI shows 'Thanks - we've got it.' confirmation",
+    "pytest subset: 6/6 passed (TestAdminCreds, TestGuestAuth, TestLoginBruteForce) in 3.98s"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_security_audit.py",
+    "/app/test_reports/pytest/iter15_bruteforce.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Fix at server.py L848 is correct and minimal (identifier = f\"{_client_ip(request)}:{email}\")",
+    "Still open from iter14 (non-blocking, FYI): server.py is 1185 lines - consider splitting into routers; login_attempts rows are not cleaned when lockout window expires - a TTL index on locked_until or a background sweeper would prevent unbounded growth; in-memory rate_limit buckets don't survive restart or multiple replicas"
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (6/6 retest subset)", "frontend": "100% (contact inquiry submit 201 + confirmation UI)"},
+  "test_credentials": "admin@bdsmarvel.com / ADMIN_PASSWORD from backend/.env",
+  "seed_data_creation": "Created a few TEST_* inquiry rows and one throwaway guest user (bf2_*). Deleted 13 throwaway login_attempts rows post-test to leave the brute-force counter clean.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Security audit is now fully green (iteration_14's 24 + this iteration's brute-force fix = 25/25). The regression file is /app/backend/tests/test_security_audit.py; the only test that permanently consumes a per-IP bucket is TestRateLimitsLast (public inquiries 5/hr) - restart backend before re-running to reset in-memory rate buckets.",
+  "rca of the issue": "iteration_14 RCA stands: request.client.host returns the Kubernetes ingress hop IP which rotates between pod IPs, so the per-identifier login_attempts counter was split across multiple keys and never reached 5. Fix in server.py L848 switches to _client_ip(request) which reads the first hop of X-Forwarded-For, producing a stable per-real-client identifier. Reproduction (post-fix): 6 wrong-password POSTs to /api/auth/login for the same throwaway email -> the 6th and 7th now return 429 as expected."
+}

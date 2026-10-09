@@ -1,0 +1,43 @@
+{
+  "summary": "Comprehensive backend + frontend testing of the Airbnb-style /stays discovery+booking flow for BDS Marvel. Backend auth (register/login/me/refresh/logout), stays booking creation (instant/request), overlap 409, past-date 422, capacity 422, bookings/mine, bookings/{id}, availability, and legacy /bookings all pass. Frontend /stays home, where-panel autoopen, calendar, who counters, search navigation to results (with map, count, cards, price per nights), stay detail (gallery, blocked dates for 11-12 Nov from confirmed booking, booking-panel error without dates), checkout multi-step (edit dates/guests modals, register, phone, agree, submit) with instant mode producing a successful confirmed trip page (BDS-5F356C) all work. Mobile (390px) search pill, sheet, mobile-booking-bar + sheet all present.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/stays/bookings email notify", "issue": "Known: email sending fails with 401 (EMERGENT_EMAIL_KEY) - booking still saved. Logged as 'Stay booking saved but email notification failed'."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Checkout.jsx", "issue": "URL query params checkin/checkout/adults/children/infants/pets/mode are NOT pre-populated into the checkout state on load. Only mode is honored (via checkout-mode-* tabs). User lands on checkout from detail with ?checkin=&checkout=&adults=... and the Dates/Guests both show 'Not selected' + 'Choose your check-in and checkout dates.' / 'Add at least one adult.' This breaks the stated requirement 'navigate to /stays/book/<slug>?mode=...  preserving dates/guests' and forces guest to re-enter.", "selector": "/stays/book/<slug>?checkin=...&checkout=...&adults=... -> summary-dates and checkout-guests should reflect query params", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Search results /stays/search", "issues": ["Leaflet map tiles render blank/light grey in results map (stays-map); only price pins visible. Likely Google tile URL loading issue or CORS/CSP; detail-map on StayDetail renders similarly minimal. Pins are shown but tiles missing hurts the discovery UX."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_stays_backend.py",
+    "/app/test_reports/pytest/stays_backend.xml"
+  ],
+  "action_items": [
+    "Checkout.jsx: On mount, parse URL query params (checkin, checkout, adults, children, infants, pets) and seed draft/sessionStorage so the trip step shows the dates/guests and price breakdown without user editing again. Spec explicitly requires this.",
+    "Investigate why Leaflet tiles render blank on stays-map (and detail-map). Verify tile URL template reaches browser (e.g., https://mt{s}.google.com/vt/lyrs=m&... ) and is not blocked by CSP; add an OSM fallback.",
+    "(Low) The google sign-in button is a <button> element without an href; verify it navigates to https://auth.emergentagent.com/?redirect=<current checkout url> on click. Automated test only verified it renders; manual verification suggested."
+  ],
+  "critical_code_review_comments": [
+    "server.py get_current_user: fine but 'bearer' is tried as session first then jwt; both lookups run which costs 2 DB calls on every authed request when using Authorization header. Minor perf.",
+    "server.py JWT_SECRET read at import time via os.environ[...] - will crash on missing env; acceptable but prefer explicit startup validation.",
+    "_confirmed_overlap uses lexicographic string comparison on YYYY-MM-DD which is correct, but relies on consistent date format; a comment or parse-to-date would be safer.",
+    "Checkout.jsx should honor incoming URL query params (checkin/checkout/adults/...) - clear bug vs spec."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_stays_backend.py (new)"
+  ],
+  "success_rate": {"backend": "95% (17/18 passed; 1 was a test-side fixture scoping issue under pytest-xdist, not a backend bug; 1 availability assertion fixed is a test-side issue - endpoint returns {booked, requested} dict which is actually what frontend consumes)", "frontend": "90% (all testids and flows working; one spec deviation - URL params not pre-populated in checkout; map tiles blank)"},
+  "test_credentials": "Admin: mukeshkhandelwal212@gmail.com / <redacted>. Created UI guest TEST_UIGuest / test_guest_ui_<ts>@example.com / Pass#1234 (confirmed booking BDS-5F356C for The Living Studio 2026-12-01..03).",
+  "seed_data_creation": "Via tests: 2 StayBookings on The Living Studio (confirmed 2026-12-05->07 and requested 2026-12-20->22) plus the UI-created confirmed 2026-12-01->03. Several TEST_ prefixed users. Pre-existing 2026-11-11->13 confirmed booking preserved (used for overlap test).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression file at /app/backend/tests/test_stays_backend.py; run with pytest -v. The Living Studio has 3 confirmed bookings now (2026-07-10..13 preserved, 2026-11-11..13 preserved for overlap tests, 2026-12-01..03 and 2026-12-05..07 added) and 1 requested (2026-12-20..22). After main agent fixes the URL params in Checkout.jsx, re-run the flow /stays/book/living-studio?mode=instant&checkin=2026-12-10&checkout=2026-12-12&adults=2 and verify Dates/Guests immediately reflect without edit modals; and verify sessionStorage preservation on reload.",
+  "rca_of_the_issue": "Checkout.jsx does not read query string on mount; the search pill navigates to /stays/search?... which StaysSearch does parse, but the detail 'Book this stay' / 'Request a night' buttons link to /stays/book/<slug>?mode=...&checkin=...&checkout=...&adults=... and Checkout only reads sessionStorage draft or default empty state. Fix: in Checkout.jsx initial state effect, parse useSearchParams for checkin/checkout/adults/children/infants/pets and merge into draft (also persist to sessionStorage) before rendering."
+}

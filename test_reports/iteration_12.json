@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only visual regression test of /catalogue filter pills after CSS fix. Verified computed styles across default, hover (inactive), active, and active+hover states for all 7 Category filter pills via Playwright. Bug is FIXED: active pills on hover now retain dark background (rgb(13,11,9)) + light text (rgb(244,239,230)) instead of becoming invisible. Border-radius is 999px (pill shape) on all pills. Clicking categories correctly filters the grid and updates catalogue-result-count. No JS console errors observed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_details": {
+    "border_radius": "999px on all pills (pill-shaped)",
+    "default_state": "transparent bg + dark ink text (rgb(13,11,9)) over light paper page bg — readable",
+    "hover_inactive": "bg rgba(10,10,10,0.05) + dark ink text — readable (fix confirmed: hover no longer forces light text)",
+    "active": "bg rgb(13,11,9) + light paper text rgb(244,239,230) — readable",
+    "active_hover": "bg rgb(13,11,9) + light paper text rgb(244,239,230) — readable (PRIMARY BUG FIXED; .filter-pill--active:hover now overrides)",
+    "counts_observed": {"all": 41, "flooring": 6, "furniture": 4, "marble-stone": 18, "interior-designing": 4, "construction": 1, "interior-decor": 8},
+    "counts_expected_in_request": {"all": 28, "flooring": 6, "furniture": 4, "marble-stone": 18, "interior-designing": 4, "construction": 1, "interior-decor": 8},
+    "count_note": "All individual category counts match exactly. ALL shows 41 (actual DB total: 6+4+18+4+1+8 = 41 across the six listed categories; the 28 in the request appears outdated and is NOT a regression from the CSS fix)."
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "CSS fix for .filter-pill--active:hover is correctly specified and takes precedence over .filter-pill:hover; verified at runtime.",
+    "Minor: request mentioned expected ALL=28 but actual catalogue total is 41 — reconcile with product owner if 28 was intended seed count (unrelated to this CSS task)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100%"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "CSS visual fix on /catalogue filter pills verified complete. Pill shape (border-radius:999px) and all 4 state combinations (default/hover/active/active+hover) are readable. Only noted discrepancy: ALL count = 41 vs 28 in request — not a regression, likely stale expected value."
+}

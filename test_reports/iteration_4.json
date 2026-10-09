@@ -1,0 +1,24 @@
+{
+  "summary": "Validated the two new features: (1) owner email notifications ON — POST /api/inquiries and authed POST /api/stays/bookings both return 201 and the backend emits HTTP 202 Accepted from https://integrations.emergentagent.com/api/v1/email/send with 'Inquiry/Booking notification emailed to info@bdsmarvel.com' log lines (verified in /var/log/supervisor/backend.err.log). (2) Guest Trips page /stays/trips — logged-out shows trips-login + AuthPanel, fresh registration via auth-tab-register works, empty state (trips-empty + Explore stays link) renders, after creating a booking the trip appears under trips-upcoming with trip-card-<id> + status pill 'Confirmed' + dates/nights/guests/total/reference, clicking the card opens the trip detail page (trip-status). /stays nav shows 'Your trips' (stays-my-trips) which routes to /stays/trips. Regression: /stays home still renders Premium/Mid/Budget-friendly tiers; /owner correctly gatekeeps a non-admin signed-in user ('Owner access only'). Backend pytest: 6/6 passed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_trips_and_emails.py",
+    "/app/test_reports/pytest/trips_emails.xml",
+    "/app/backend/tests/test_import_bdsm.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is now ~1079 lines across inquiries, stays, admin, catalog, auth and email helpers — recommend splitting into routers (noted in iteration_3).",
+    "GET /api/stays/bookings/mine uses .sort('created_at', -1); created_at is stored as ISO string (see line 965) and other endpoints store datetime objects — mixed storage types could cause fragile sorting across code paths. Works today because the collection consistently receives strings here.",
+    "MyTrips.jsx 'past' filter uses !(check_out>=today && status !== cancelled && status !== declined), which also puts cancelled/declined future bookings into Past — acceptable UX but worth documenting.",
+    "test_credentials.md lists admin as info.bdsmarvel@gmail.com while iteration_3 report said admin@bdsmarvel.com; backend .env ADMIN_EMAIL=info.bdsmarvel@gmail.com is the source of truth. Prior report entry was stale."
+  ],
+  "updated_files": ["/app/backend/tests/test_trips_and_emails.py"],
+  "success_rate": {"backend": "100% (6/6 new + 14/14 regression)", "frontend": "100% (all data-testids resolved)"},
+  "test_credentials": "Admin (owner): info.bdsmarvel@gmail.com / <redacted>. Guests registered on the fly (min 6 chars).",
+  "seed_data_creation": "Created several TEST_ guest users and TEST stay bookings on The Living Studio / Oak Apartment / Kota Flat across future dates (60-105 days out). Not auto-cleaned; low-risk preview data.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Both new features verified end-to-end. Email sends go to info@bdsmarvel.com and return HTTP 202 from integrations.emergentagent.com. GET /api/stays/bookings/mine returns the authenticated user's bookings only (confirmed no cross-user leak). FE data-testids: my-trips, trips-login, trips-empty, trips-upcoming, trips-past, trip-card-<id>, trip-card-status-<id>, trips-explore, stays-my-trips, trip-status. Reusable regression suites: /app/backend/tests/test_import_bdsm.py and /app/backend/tests/test_trips_and_emails.py."
+}

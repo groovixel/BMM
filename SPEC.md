@@ -1,0 +1,32 @@
+# Exact Repository Import
+
+- Source: `https://github.com/groovixel/BDSM-Site.git`
+- Branch: `main`
+- Imported commit: `07337d0039b755b25a12f232fdb3640889f62b38`
+- Frontend: React 19 Create React App with CRACO, Yarn 1, Tailwind CSS 3, React Router, Lenis smooth scrolling
+- Backend: FastAPI with Motor/PyMongo and MongoDB
+- Main routes: `/`, `/about`, `/projects`, `/catalogue`, `/experience`, `/contact`, plus `/api/` and `/api/status`, `/api/inquiries`
+- Authentication: none
+- Required local environment: backend `MONGO_URL`, `DB_NAME`, optional `CORS_ORIGINS`; frontend `REACT_APP_BACKEND_URL`
+- Scope history: the source was initially imported unchanged; later user-requested visual and brand corrections are tracked in this destination
+- Mobile spacing refinement: at widths up to 800px, homepage hero height, network article media wrappers, section padding, inner-page heroes, content sections, and footer gaps are compacted while desktop styling remains unchanged
+- Destination runtime compatibility: `yarn dev` aliases the source `craco start` command so the existing preview supervisor can keep the frontend available
+- Brand name: all company attribution uses `BDS Marvel`; material and product references continue to use “Marble” where technically correct
+- Business network: homepage network rail and article sequence contain five businesses in the order 01 Interior Designing (BDS Marvel, creamy yellow #eedcae), 02 Construction (Formwork), 03 Marble & Stone (Drawstones), 04 Flooring (Renest), 05 Interior Decor (Vignette), with counters automatically rendering 01/05 through 05/05
+- Air BnB separation: the Living Studio is a standalone full-width homepage feature after the business network, linking directly to `/experience` and opening the request-a-night modal; it is not included in business filters, business contact options, or business detail pages
+- Air BnB spotlight motion: badge, heading, copy, details, and actions use the business-article staged rise/fade every time the standalone section enters the viewport from either scroll direction; leaving resets it for replay, with reduced-motion support
+- Network slide palette: article 4 uses warm mushroom stone `#b8a394`; the standalone Air BnB feature uses muted olive-stone `#b9b49a` as its card accent
+- Business rail: all active and inactive ordered-list text, numbering, underlines, and caret render black across desktop and mobile
+- Client showcase: a compact, borderless two-row monochrome logo marquee sits directly below the homepage hero; all twenty self-contained typographic marks loop automatically at a calm 38/42-second pace, with rows moving in opposite directions and pausing on hover or reduced-motion preference
+- Client showcase label: the eyebrow copy is exactly `Clientle`
+- Mobile purpose accordion: at widths up to 800px, the five “How BDS Marvel Builds” items open one at a time directly beneath their clicked button in normal document flow, using height/fade/slide motion; desktop retains the original split list-and-feature layout
+- Desktop purpose transition: changing a purpose by tab or arrow replays a subtle 24px right-to-left fade/slide on the feature panel, with reduced-motion support
+- Purpose highlight palette: item 04 reuses the Interiors article mushroom `#b8a394`; item 05 reuses the standalone Air BnB olive-stone `#b9b49a`; items 01–03 retain their original colors
+- Header wordmark: the visible mark is plain `BDSM` with no registered-symbol suffix
+- Navigation drawer: the email/copyright footer appears on desktop and mobile; opening the mobile drawer uses a 44px touch target, locks background scroll, exposes expanded state, and supports Escape-to-close
+- Navigation footer placement: `HELLO@BDSM.CO` and `© BDSM · BDS MARVEL` stay in normal flow after all seven navigation buttons; desktop uses one line, mobile stacks two lines, and short screens can scroll without overlap
+- Navigation drawer sizing: the drawer reserves separate grid rows for headline, navigation, and attribution; the headline scales with viewport height so footer text remains visible without overlaying buttons
+- Navigation labels: the seven drawer destinations render 10% larger at 13.2px with regular weight; their 01–07 index numbers remain 9px regular weight
+- Footer scroll control: its arrow is 5% larger at 15.75px on every viewport; the visible “To the Top” label is hidden at mobile widths while the accessible name remains available
+- Homepage contact CTA: the section uses a visibly warm buttercream off-white `#efe2c6`, distinct from all backgrounds above it and intentionally neither white nor grey-white, with darkened micro-label contrast
+- Stays & booking: `/stays` is a category overview (Premium / Mid / Budget-friendly); each category has its own page `/stays/premium`, `/stays/mid`, `/stays/budget-friendly` listing five BnBs each (15 stays total, placeholder names/locations/prices) with tier badge, description, amenities and a BOOK THIS STAY button opening a booking-request modal (name, email, check-in/out dates, guests, notes); requests persist to Mongo `bookings` and email the owner; overlapping date ranges per stay are blocked only for `confirmed` bookings (HTTP 409); new bookings start as `requested` and are shown in the modal as "awaiting confirmation" without blocking, via `GET /api/stays/availability`; the owner flips status with `POST /api/bookings/{id}/status` (`requested`/`confirmed`/`cancelled`). All "Request a Night" CTAs (homepage spotlight + experience page) route to `/stays`, and `/experience` tier cards link to each category page.

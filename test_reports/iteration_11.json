@@ -1,0 +1,36 @@
+{
+  "summary": "Iteration 11 — verified SPAM SHIELD rate limiting on POST /api/inquiries & /api/sample-requests (5 per IP per hour, independent buckets, 429 with correct detail on 6th), new GET /api/auth/status endpoint (always 200; null user when unauthed, admin user when logged in), and QUIET CONSOLE on public pages (homepage and /contact logged out produce zero 401 responses and zero console errors; nav still shows PROJECTS/CATALOGUE/CONTACT). Regression: /api/auth/login + /api/auth/me still correct (200 authed, 401 unauthed). All 7 backend pytest cases pass. Used X-Forwarded-For header to spoof per-test unique IPs so real client-IP bucket isn't exhausted and real-email volume stays minimal (6 inquiries + 6 samples + 5 extra inquiries + 1 sample + 1 persistence inquiry = ~19 real Resend emails fired to info@bdsmarvel.com as expected design).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/sample-requests, POST /api/inquiries", "issue": "rate_limit() dependency increments the per-IP bucket BEFORE Pydantic body validation, so malformed/422 requests still consume a rate slot. Observed first run: 5x 422 then 6th returned 429. Not a security hole (actually makes shield stricter against bots posting junk), but it does mean a legitimate user making 5 typos locks themselves out for an hour. Consider moving the counter increment to AFTER validation (e.g., record only on successful insert) or checking (dq) before increment and incrementing in the endpoint body."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration11_rate_limit_and_auth_status.py",
+    "/app/test_reports/pytest/iteration_11.xml"
+  ],
+  "action_items": [
+    "(Optional, minor) Reconsider counting rate-limit hits for 422/invalid payloads — currently malformed submissions consume rate budget."
+  ],
+  "critical_code_review_comments": [
+    "Rate-limit bucket is module-global in-memory (defaultdict(deque)); on multi-worker deploys each worker would have its own counter. Acceptable for current single-worker preview; call out before scaling.",
+    "No periodic purge of _RATE_BUCKETS keys — stale IP keys accumulate forever. For a tiny site this is fine; add a background sweep if usage grows.",
+    "/api/auth/status silently refreshes access cookie via Set-Cookie on GET — correct and intentional per spec; nice touch."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration11_rate_limit_and_auth_status.py (new regression file)"
+  ],
+  "success_rate": {"backend": "100% (7/7)", "frontend": "100% (home + /contact, 0 console errors, 0 401s)"},
+  "test_credentials": "admin info@bdsmarvel.com / <redacted> (used for auth/status + /auth/me regression + admin inquiries GET)",
+  "seed_data_creation": "Created several TEST_RL* inquiries and sample-requests (via spoofed X-Forwarded-For IPs) during rate-limit boundary runs. One TEST_RL_PERSIST_<hex> inquiry was verified visible via admin GET /api/inquiries.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Rate limit is in-memory per IP per bucket (5/3600s). Future testers should restart backend (sudo supervisorctl restart backend) before boundary tests to clear state, or spoof X-Forwarded-For with a fresh IP per test (as this iteration does). Each successful inquiry/sample POST sends a real Resend email — keep volume minimal. Independent buckets confirmed for 'inquiries' vs 'sample-requests'.",
+  "rca of the issue": "N/A — both features implemented correctly and verified."
+}

@@ -1,0 +1,23 @@
+{
+  "summary": "Verified fix for stays search bar input-focus bug (SearchBar.jsx mobile sheet + stays/ui.jsx Modal). Independently reproduced the originally-reported scenario and confirmed focus is retained across multi-character typing and Backspace deletions on both mobile (390px) and desktop (1440px). Regression-tested modal open/close via Escape key and X button, and completed the end-to-end stays search flow. Fix in /app/frontend/src/stays/ui.jsx (storing onClose in onCloseRef and reducing effect deps to [open]) is working as intended.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "stays/ui.jsx Modal useEffect omits onClose from deps intentionally (ref pattern); consider adding // eslint-disable-next-line react-hooks/exhaustive-deps and a short comment so future contributors don't reintroduce the bug by 'fixing' the lint warning.",
+    "Modal scrim <button onClick={onClose}> still uses the live prop (fine), but could also route through onCloseRef for consistency.",
+    "Main-site consultation/contact modals are not implemented via stays/ui.jsx Modal (no shared component found), so this fix does not affect them — no regression risk."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Focus-persistence fix verified. Tests performed: (1) mobile sheet typed 'jaip' + 2 backspaces, focus stayed on search-where-input every keystroke; (2) desktop /stays typed 'goa' + 2 backspaces, focus retained; (3) Escape and X close modal; (4) search flow -> /stays/search?where=Rajasthan navigates correctly. No regressions found.",
+  "rca of the issue": "Original: Modal effect had deps [open, onClose]; inline onClose arrow in SearchBar was recreated on every setSearch re-render, retriggering effect cleanup which re-focused the previously-active element (sheet close button), stealing focus from the input after each keystroke. Fix: store onClose in a ref updated every render; keep effect deps [open] only. Verified working."
+}

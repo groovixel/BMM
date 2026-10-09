@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only verification of mobile SIGN IN + drawer account row on BDS Marvel /stays. All four scenarios in the review request PASSED: (1) mobile logged-out header shows header-signin-link; drawer shows drawer-signin-link + drawer-stays-link; tapping drawer SIGN IN navigates to /stays/trips and shows the login panel. (2) Mobile logged-in (fresh guest registered via /api/auth/register) shows account-menu-button in header (header-signin-link hidden), drawer shows drawer-account-name='Test Guest', drawer-trips-link and drawer-logout; YOUR TRIPS routes to /stays/trips; LOG OUT returns to logged-out state with SIGN IN re-appearing. (3) Desktop 1920x1080 /stays shows SIGN IN when logged out and avatar menu + drawer account row ('BDS Marvel Admin' + YOUR TRIPS + LOG OUT) when logged in as admin; nav items + account row + footer render in drawer. (4) Regression: drawer still opens on mobile stay detail page /stays/home/living-studio with z-index 900 (overlays reserve bar area); drawer open/close works cleanly on homepage desktop + mobile.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "App.js has grown large (Header + drawer + many sub-components in a single file) — consider splitting Header/Drawer into their own modules per the >700-line guideline.",
+    "The regression check for the mobile stay detail reserve bar could not locate a '.reserve-bar' selector programmatically — behavior visually looks fine (drawer z-index=900) but adding a data-testid='stay-reserve-bar' would make future regressions deterministic."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Admin info.bdsmarvel@gmail.com / <redacted> (used for desktop logged-in drawer check). Guest registered on the fly via /api/auth/register and cleaned up after test.",
+  "seed_data_creation": "Created and deleted one TEST_ guest (test_guest_yv2nsl@example.com) via /api/auth/register; row removed from users collection post-test.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Mobile drawer account row (SIGN IN · STAYS when logged out, name + YOUR TRIPS · LOG OUT when logged in) and header-signin-link visibility on mobile are verified across /stays, /stays/trips, /stays/home/living-studio, and homepage. useAuth() reads from GET /api/auth/me (httpOnly cookies). If adding further tests, prefer data-testid=stay-reserve-bar for the mobile reserve bar regression.",
+  "rca of the issue": "N/A — this iteration was verification only; all requested behaviors render correctly on both viewports and in both auth states."
+}

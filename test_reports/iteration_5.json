@@ -1,0 +1,24 @@
+{
+  "summary": "Validated the two newly-shipped changes: (1) Guest booking confirmation email + guardrail — POST /api/stays/bookings now sends TWO emails (owner → info@bdsmarvel.com AND guest confirmation), both HTTP 202 via Emergent Resend proxy. With guest=delivered@resend.dev the backend logs both 'Booking notification emailed to info@bdsmarvel.com' and 'Guest booking confirmation emailed to delivered@resend.dev'. With an undeliverable guest email (nobody@example.com) the booking still returns 201 and only an ERROR line 'Stay booking saved but guest confirmation email failed: 502: Failed to send email' is logged — owner email still succeeds. (2) Account menu in site header — logged out shows SIGN IN link (data-testid=header-signin-link) → /stays/trips with no avatar; logged in shows circular avatar (data-testid=account-menu-button) with initials, click opens dropdown (data-testid=account-menu-dropdown) with the user name + email, YOUR TRIPS (data-testid=account-menu-trips) that routes to /stays/trips, and LOG OUT (data-testid=account-menu-logout) that clears session (SIGN IN returns, avatar gone). (3) /stays nav no longer contains data-testid=stays-my-trips. Regression OK: /stays renders Premium/Mid/Budget-friendly tiers; Google 'Continue with Google' button still present on auth panel; booking APIs still 201. Backend pytest: 2/2 new + prior 6/6 trips suite still green.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_guest_confirmation_email.py",
+    "/app/test_reports/pytest/guest_conf.xml",
+    "/app/backend/tests/test_trips_and_emails.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py (~1106 lines) still growing — split into routers (inquiries, stays, admin, auth, email helpers). Carried over from iteration_3/4.",
+    "In create_stay_booking the trip_url uses raw Origin header: trip_url = f'{origin}/stays/trips/{booking.id}' when origin.startswith('https://'). Consider allow-listing (or stripping trailing slash) so a malicious Origin can't inject a link to an attacker domain in the guest confirmation email — low risk but worth hardening.",
+    "Mixed storage of created_at (ISO string for bookings vs datetime objects elsewhere) — unchanged from last iteration, still a latent sort/consistency risk."
+  ],
+  "updated_files": ["/app/backend/tests/test_guest_confirmation_email.py"],
+  "success_rate": {"backend": "100% (2/2 new, 6/6 trips regression)", "frontend": "19/20 (1 false-negative: assertion was case-sensitive on an email the backend lowercases; email IS visible in dropdown as 'test_ui_...@example.com')"},
+  "test_credentials": "Admin: info.bdsmarvel@gmail.com / <redacted>. Guests registered on the fly (6+ char passwords).",
+  "seed_data_creation": "Created ~3 TEST_* guest users (TEST_conf_*, TEST_bad_*, TEST_ui_*@example.com) and 3 TEST stay bookings on The Living Studio / The Oak Apartment at 90-102 days out. Not auto-cleaned; low-risk preview data.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Email flow: /api/stays/bookings fires owner email first, then guest confirmation; both failures are caught independently so booking persists regardless. Successful log markers to grep: 'Booking notification emailed to info@bdsmarvel.com' and 'Guest booking confirmation emailed to <addr>'. Failure marker: 'Stay booking saved but guest confirmation email failed'. Account menu testids: header-signin-link, account-menu, account-menu-button, account-menu-dropdown, account-menu-trips, account-menu-logout. /stays no longer has stays-my-trips. Reusable regression suites: /app/backend/tests/test_import_bdsm.py, /app/backend/tests/test_trips_and_emails.py, /app/backend/tests/test_guest_confirmation_email.py.",
+  "rca of the issue": "N/A — no bugs found."
+}

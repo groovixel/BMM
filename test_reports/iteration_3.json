@@ -1,0 +1,26 @@
+{
+  "summary": "Verified fresh import of BDS Marvel runs end-to-end. Backend: 14/14 pytest cases pass covering health (/api/), auth (register sets JWT cookie, admin login returns role=admin, /auth/me 401 when unauthenticated), inquiries (public POST 201, GET 401 unauth / 200 admin), stays (availability returns {booked, requested}, authed instant booking returns 201 with BDS- reference, overlap returns 409, unauth 401), and admin dashboard (/admin/overview, /admin/bookings, /admin/enquiries return correct shape with admin cookies, 401 without). Frontend: homepage shows 'Architecture. Interiors. Everything In Between.' brand intro; /stays renders Premium/Mid/Budget-friendly tier sections with listings; /owner login with admin@bdsmarvel.com / <redacted> succeeds and shows owner-dashboard with all 4 stats tiles and 3 tabs (Night requests / All bookings / Enquiries) switchable. Email send endpoint accepts submissions (previously confirmed HTTP 202).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_import_bdsm.py",
+    "/app/test_reports/pytest/import_bdsm.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is ~1079 lines; consider splitting routers (auth, stays, admin, catalog) into modules for maintainability (pre-existing, flagged in prior iterations).",
+    "Backend lowercases emails on registration; this is correct, but FE/tests should compare case-insensitively.",
+    "Startup correctly re-seeds admin from ADMIN_EMAIL/ADMIN_PASSWORD and demotes other admins. Idempotent."
+  ],
+  "updated_files": ["/app/backend/tests/test_import_bdsm.py"],
+  "success_rate": {"backend": "100% (14/14)", "frontend": "100% (3/3 pages)"},
+  "test_credentials": "Admin: admin@bdsmarvel.com / <redacted>. Guests registered on the fly via /api/auth/register.",
+  "seed_data_creation": "Created 1 TEST inquiry and 1 TEST stay booking (The Living Studio, 45-47 days out). Cleaned up via pymongo at session end (bookings cancelled via admin API + inquiries/bookings prefixed TEST_ deleted).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Import is clean. Admin creds are admin@bdsmarvel.com / <redacted> (NOT the legacy info.bdsmarvel@gmail.com used in older owner_dashboard_test.py). Fresh guest registration works. Stays availability returns a dict {booked: [...], requested: [...]}, not a flat list — unlike the older test_stays_backend.py which asserts a list (that older test is stale against this backend's /stays/availability). Reuse /app/backend/tests/test_import_bdsm.py for regression."
+}

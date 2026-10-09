@@ -1,0 +1,29 @@
+{
+  "summary": "Owner Dashboard feature tested end-to-end. Backend: 9/9 pytest cases pass covering admin JWT gating (401 unauth on /api/admin/* and legacy admin GET endpoints), demotion of old admin to guest (403), guest 403, request-mode booking creation, admin approve/decline/cancel workflow, availability + 409 overlap guard, declined bookings persisted (not deleted) and dates still free, admin enquiries aggregator with type labels, overview counts. Frontend (/owner): login form renders, wrong password shows owner-login-error, admin login shows owner-dashboard with stats and tabs, pending booking card shows guest contact details (name/email/phone), Approve updates status pill to confirmed in-place and decrements pending badge, All bookings tab Cancel button sets status to cancelled, Enquiries filter chips (consultation, contact) filter the list correctly, owner-logout returns to login, demoted mukeshkhandelwal212@gmail.com sees owner-denied screen, denied-logout returns to login. Known-ignored: email notifications 401 (per task note).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "OwnerDashboard stats", "issues": ["After local approve/cancel, owner-stat-upcoming and owner-stat-bookings/enquiries are not re-synced from server (only pending_requests is adjusted client-side). Minor stale-count display until Refresh is clicked. Consider calling load() or returning new overview from the action endpoint."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/owner_dashboard_test.py", "/app/test_reports/pytest/owner_dashboard.xml"],
+  "action_items": [
+    "Optional polish: after approve/decline/cancel, re-fetch overview (or have the admin endpoint return it) so upcoming_stays and total counts stay in sync without a manual Refresh."
+  ],
+  "critical_code_review_comments": [
+    "Admin gating is consistent via Depends(require_admin) on all /admin/* and legacy list endpoints.",
+    "Admin status update correctly re-checks overlap only when transitioning to 'confirmed' (409 guard).",
+    "Declined bookings are preserved (status update, no deletion) and do not block availability \u2013 matches requirement.",
+    "startup_auth idempotently re-hashes ADMIN_PASSWORD and demotes other admins; good.",
+    "server.py is 1079 lines \u2013 nearing the >700 split threshold; consider splitting routers (auth, stays, admin, catalog) into modules."
+  ],
+  "updated_files": ["/app/backend/tests/owner_dashboard_test.py"],
+  "success_rate": {"backend": "100% (9/9)", "frontend": "100% (all flows passed)"},
+  "test_credentials": "Admin info.bdsmarvel@gmail.com / <redacted>; demoted mukeshkhandelwal212@gmail.com / <redacted>; guests created on the fly via /api/auth/register.",
+  "seed_data_creation": "Created 1 TEST inquiry, 1 TEST consultation, and 2 TEST stay bookings (The Living Studio) during tests. Test bookings were deleted at the end via MongoDB (bookings with email starting TEST_). Enquiries intentionally kept per task instructions.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Owner Dashboard flows (approve/decline/cancel/filter) + admin gating verified. If retesting, reuse /app/backend/tests/owner_dashboard_test.py (session-scoped fixtures seed and clean up data). Note: upcoming_stays/total_bookings in UI stats are stale after local actions until Refresh \u2013 cosmetic only."
+}

@@ -1,0 +1,212 @@
+{
+  "project_name": "BDS Marvel Stays - Mobile Experience Blueprint",
+  "brand_identity": {
+    "name": "BDS Marvel Stays",
+    "positioning": "Luxury Marble & Stone Studio with Boutique Stays across India",
+    "tone": "Tactile Architectural Elegance, Warm Paper Texture, Crisp Ink Typography, Fine Gold Accents",
+    "color_archetype": "Luxury Organic & Earthy (Cream Paper, Ink Black, Milled Gold)",
+    "design_philosophy": "Combine Airbnb's intuitive mobile UX patterns with BDS Marvel's bespoke luxury stone & architectural studio aesthetic."
+  },
+  "typography": {
+    "fonts": {
+      "heading": "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+      "body": "'Outfit', 'DM Sans', system-ui, sans-serif",
+      "mono": "'JetBrains Mono', 'Fira Code', monospace"
+    },
+    "scale": {
+      "h1_hero": "text-2xl sm:text-3xl font-serif font-medium tracking-tight leading-tight",
+      "h2_section": "text-xl sm:text-2xl font-serif font-medium tracking-tight text-[#0d0b09]",
+      "h3_card": "text-base font-sans font-semibold text-[#0d0b09]",
+      "sub_heading": "text-sm font-sans font-medium text-[#6f685c]",
+      "body_base": "text-sm font-sans leading-relaxed text-[#0d0b09]",
+      "caption": "text-xs font-sans text-[#6f685c]",
+      "pill_label": "text-xs font-sans font-semibold tracking-wider uppercase text-[#0d0b09]"
+    },
+    "rules": [
+      "Do NOT use Inter or Arial for main or section headings.",
+      "Use Cormorant Garamond font for all section titles, hero headings, and search step headings.",
+      "Use Outfit for body text, numbers, buttons, guest counters, and filter tags.",
+      "Apply tracking-tight to headings above 20px to prevent loose kerning on mobile screens."
+    ]
+  },
+  "colors": {
+    "variables": {
+      "--sx-ink": "#0d0b09",
+      "--sx-paper": "#f4efe6",
+      "--sx-surface": "#fffdf8",
+      "--sx-gold": "#c9a262",
+      "--sx-gold-d": "#a8833f",
+      "--sx-muted": "#6f685c",
+      "--sx-line": "#e3dbcc",
+      "--sx-cream": "#f5f2ea"
+    },
+    "semantics": {
+      "page_background": "var(--sx-paper) (#f4efe6)",
+      "card_surface": "var(--sx-surface) (#fffdf8)",
+      "primary_text": "var(--sx-ink) (#0d0b09)",
+      "secondary_text": "var(--sx-muted) (#6f685c)",
+      "accent_gold": "var(--sx-gold) (#c9a262)",
+      "accent_gold_dark": "var(--sx-gold-d) (#a8833f)",
+      "border_line": "var(--sx-line) (#e3dbcc)",
+      "guest_favorite_badge": "bg-[#0d0b09] text-[#f4efe6] or bg-[#fffdf8] text-[#0d0b09] with 1px border",
+      "price_pill_map": "bg-[#fffdf8] text-[#0d0b09] border 1px border-[#e3dbcc] shadow-md hover:bg-[#0d0b09] hover:text-[#f4efe6]",
+      "search_pill": "bg-[#fffdf8] border 1px solid [#e3dbcc] shadow-[0_4px_18px_rgba(13,11,9,0.08)] text-[#0d0b09]"
+    },
+    "rules": [
+      "FORBIDDEN COLOR: Do not use teal green (#1B93A4) or harsh electric purple (#7351B7).",
+      "All text must satisfy WCAG AA contrast (min 4.5:1 for body, 3:1 for large display).",
+      "Explicitly specify text colors on hover states e.g. hover:bg-[#0d0b09] hover:text-[#f4efe6]."
+    ]
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-[#fffdf8]/90 border-b border-[#e3dbcc] for sticky top headers and float bars",
+    "sheet_scrim": "bg-[#0d0b09]/50 backdrop-blur-xs for modal/sheet backdrop overlays",
+    "card_shadows": "shadow-[0_4px_20px_rgba(13,11,9,0.06)] with 1px solid var(--sx-line) border",
+    "bento_elevation": "nested radii: child border-radius (12px) <= parent border-radius (20px)",
+    "texture": "subtle grain background styling on cream surfaces to preserve high-end paper tactile feel"
+  },
+  "components": {
+    "mobile_top_search_bar": {
+      "description": "Floating rounded search pill at top of mobile home feed & search results",
+      "structure": "Flex container with magnifying glass icon on left, 2-line stacked text (Where in bold top, Dates + Guests in muted bottom), right filter icon or go button",
+      "styling": "border: 1px solid #e3dbcc, border-radius: 999px, bg: #fffdf8, padding: 10px 18px, shadow: 0 4px 18px rgba(13,11,9,0.08)",
+      "data_testid": "search-mobile-pill"
+    },
+    "category_chips_row": {
+      "description": "Horizontal scrollable stay tiers bar (All, Premium, Mid, Budget-friendly)",
+      "styling": "gap: 20px, scrollbar-width: none, overflow-x: auto, item padding: 8px 14px, bottom active border-b-2 border-[#c9a262]",
+      "icons": "Sparkles for All, Crown for Premium, Home for Mid, Leaf for Budget-friendly",
+      "data_testid_pattern": "stays-cat-{tier_slug}"
+    },
+    "stay_card_horizontal_track": {
+      "description": "Horizontal snap-scroll listing cards for mobile home feed sections",
+      "card_aspect_ratio": "aspect-[4/3] rounded-[16px] overflow-hidden position-relative",
+      "elements": [
+        "Image carousel or static hero photo",
+        "Guest Favorite pill badge at top-left: 'Guest favorite' with laurel/star icon",
+        "Heart favorite toggle button at top-right with gold/ink transition",
+        "Location & Stay Type in serif / semi-bold sans: e.g. 'Gurgaon District · Villa'",
+        "Star rating with review count: e.g. '★ 4.96 (24)'",
+        "Price line: '₹22,500 / night' with tax inclusive disclaimer note"
+      ],
+      "data_testid_pattern": "listing-card-{slug}"
+    },
+    "mobile_search_sheet": {
+      "description": "Full-screen stepped search sheet with Accordion or Tab steps (Where, When, Who)",
+      "where_step": {
+        "title": "Where to?",
+        "search_input": "Full width rounded text input with autofocus and search icon",
+        "nearby_button": "Pill / Card option 'Nearby - Use my current location' with location target icon",
+        "suggested_destinations": "List of cities/states with stay counts and map pin icons"
+      },
+      "when_step": {
+        "title": "When's your trip?",
+        "calendar": "Single-month RangeCalendar optimized for mobile touch targets (44px min touch cell)",
+        "flex_chips": "Option chips: 'Exact dates', '± 1 day', '± 2 days'",
+        "clear_action": "Clear dates link button"
+      },
+      "who_step": {
+        "title": "Who's coming?",
+        "stepper_rows": "Adults, Children, Infants, Pets rows with age subtitles and circular [-] / [+] steppers",
+        "counter_style": "Circular buttons (36px x 36px) with 1px solid line, disabled opacity when limit reached"
+      },
+      "footer": {
+        "styling": "Sticky bottom bar with flex space-between, 'Clear all' underline link on left, primary 'Search' gold button on right",
+        "data_testid_clear": "search-sheet-clear",
+        "data_testid_submit": "search-sheet-submit"
+      }
+    },
+    "mobile_map_and_results": {
+      "description": "Mobile map view with price pills and sliding bottom sheet drawer",
+      "price_pill_markers": "Pill buttons showing '₹X,XXX', dark background when selected, white background with gold/ink border when inactive",
+      "floating_toggle_button": "Pill at bottom center 'Show map' / 'Show list' with Map/List icon, z-index: 600, background: #0d0b09, text: #f4efe6",
+      "preview_card": "Floating preview card above bottom screen when map pin is tapped",
+      "data_testid": "toggle-map"
+    },
+    "bottom_navigation_bar": {
+      "description": "Optional mobile web footer bar for quick discovery / saved stays access",
+      "styling": "fixed bottom-0 left-0 right-0 h-16 bg-[#fffdf8]/95 backdrop-blur-md border-t border-[#e3dbcc] z-50 flex justify-around items-center",
+      "items": [
+        {"label": "Explore", "icon": "Search", "path": "/stays/home"},
+        {"label": "Saved", "icon": "Heart", "path": "/stays/home?view=saved"},
+        {"label": "Search Map", "icon": "Map", "path": "/stays/search"}
+      ]
+    }
+  },
+  "grids": {
+    "mobile_home": "grid-cols-1 gap-8 px-4 py-4",
+    "horizontal_snap_track": "flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-2",
+    "mobile_search_grid": "grid-cols-1 gap-4",
+    "map_container": "w-full h-[calc(100vh-120px)] relative overflow-hidden"
+  },
+  "layouts": {
+    "header_spacing": "pt-20 pb-4 px-4",
+    "section_padding": "py-6 px-4 border-b border-[#e3dbcc]/50",
+    "card_padding": "p-0",
+    "modal_sheet": "fixed inset-0 z-[1000] flex flex-col justify-end sm:justify-center bg-[#0d0b09]/50"
+  },
+  "motion": {
+    "page_transition": "initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0 }, transition: { duration: 0.22 }",
+    "modal_sheet_slide": "initial: { y: '100%' }, animate: { y: 0 }, exit: { y: '100%' }, transition: { type: 'spring', damping: 28, stiffness: 280 }",
+    "accordion_expand": "initial: { height: 0, opacity: 0 }, animate: { height: 'auto', opacity: 1 }, exit: { height: 0, opacity: 0 }, transition: { duration: 0.22 }",
+    "heart_pulse": "whileTap: { scale: 0.82 }, transition: { duration: 0.15 }",
+    "chip_tap": "whileTap: { scale: 0.95 }"
+  },
+  "accessibility": {
+    "touch_targets": "Minimum 44px x 44px for all mobile interactive buttons, stepper controls, and day cells",
+    "keyboard_navigation": "Escape key closes sheets, Tab cycle trapped within active modal",
+    "aria_labels": "All icon-only buttons require explicit aria-label e.g. aria-label='Increase adults count'",
+    "data_testid_requirements": "All testids must be preserved: search-mobile-pill, search-sheet, search-sheet-where, search-sheet-when, search-sheet-who, search-sheet-clear, search-sheet-submit, toggle-map, map-preview, row-saved, row-{tier_slug}, open-filters, filters-modal"
+  },
+  "media": {
+    "listing_card_aspect": "aspect-[4/3] or aspect-[16/11]",
+    "border_radius": "rounded-[16px] for cards and map preview, rounded-[999px] for pills and search inputs",
+    "image_optimization": "use img(url, width) helper to load optimized images for mobile screens",
+    "fallbacks": "show gradient skeleton (.sx-skel) while imagery or availability loads"
+  },
+  "image_urls": {
+    "hero_stays": [
+      {
+        "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
+        "category": "stays_hero",
+        "description": "Luxury Marble Villa Living Room"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+        "category": "stays_hero",
+        "description": "Modern Stone Villa with Private Pool"
+      }
+    ],
+    "destinations": [
+      {
+        "url": "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=600&q=80",
+        "category": "destination",
+        "description": "Jaipur Rajasthan Fort"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80",
+        "category": "destination",
+        "description": "Goa Beachfront Villa"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "1. Review stays.css: Update mobile styles (@media max-width 768px) to align search pills, category chips, section titles, card tracks, and sheet modals with the warm paper & gold theme.",
+    "2. Restyle SearchBar.jsx on mobile: Ensure search-mobile-pill displays destination prominently in Cormorant Garamond / Outfit weight, with dates & guests below.",
+    "3. Refine Modal in ui.jsx & SearchBar.jsx: Make full-screen search sheet render smooth accordion steps (Where, When, Who) with Cormorant Garamond step titles, generous padding, and clear sticky footers.",
+    "4. Enhance RangeCalendar in ui.jsx: Single month display on mobile with 44px round day cells, gold range highlight background, and clear weekday headers.",
+    "5. Update StaysHome.jsx: Ensure category bar scrolls horizontally with smooth indicators, stay rows scroll with snap-x padding, and section titles use Cormorant Garamond font.",
+    "6. Update StaysSearch.jsx: Enhance filter bar horizontal chips, map full-screen view with custom price pills, floating 'Show map' button, and slide-up map card preview.",
+    "7. Do NOT remove or modify any existing data-testid attributes.",
+    "8. Ensure all touch targets are at least 44px x 44px on touch viewports."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": {
+    "anti_patterns": [
+      "No default un-styled select boxes or browser native pickers.",
+      "No stark pure white backgrounds over dark elements without border contrast.",
+      "No missing data-testid tags on interactive elements.",
+      "No broken mobile layouts with horizontal scroll overflows outside designated tracks."
+    ],
+    "testing_compliance": "Ensure all interactive buttons, steppers, date cells, search sheet triggers, filter triggers, and navigation links maintain their exact data-testid strings."
+  }
+}
