@@ -308,6 +308,7 @@
 .sx-stars em{color:#cfc5b3;font-style:normal}
 .sx-review p{margin-top:6px}
 .sx-dmap{height:380px;border-radius:var(--sx-r);overflow:hidden;margin:14px 0 18px}
+.sx-dmap .leaflet-top,.sx-dmap .leaflet-bottom{z-index:500}
 .sx-know{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
 .sx-know h3{font-size:16px;font-weight:600;margin:0 0 10px}
 .sx-know p{display:flex;gap:8px;align-items:center;font-size:15px;margin:0 0 8px}
