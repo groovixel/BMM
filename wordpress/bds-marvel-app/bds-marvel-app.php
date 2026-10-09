@@ -2,7 +2,7 @@
 /**
  * Plugin Name: BDS Marvel App
  * Description: BDS Marvel design, WordPress guest accounts, bookings, private enquiries and owner dashboard. Use [bds_marvel_app] or the companion theme.
- * Version: 2.0.0
+ * Version: 2.0.1
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Author: BDS Marvel
@@ -24,10 +24,10 @@ function bdsm_app_enqueue($mode = 'hash') {
     foreach ($manifest['entrypoints'] ?? array() as $i => $file) {
         if (!preg_match('#^static/(js|css)/[a-zA-Z0-9._/-]+\.(js|css)$#', $file) || strpos($file, '..') !== false) { continue; }
         $url = BDSM_APP_URL . 'build/' . $file;
-        if (substr($file, -4) === '.css') { wp_enqueue_style('bdsm-app-css-' . $i, $url, array(), '2.0.0'); }
+        if (substr($file, -4) === '.css') { wp_enqueue_style('bdsm-app-css-' . $i, $url, array(), '2.0.1'); }
         if (substr($file, -3) === '.js') {
             $handle = 'bdsm-app-js-' . $i;
-            wp_enqueue_script($handle, $url, $previous, '2.0.0', true);
+            wp_enqueue_script($handle, $url, $previous, '2.0.1', true);
             if (!$previous) {
                 $config = array('apiUrl' => untrailingslashit(rest_url('bds/v1')), 'assetUrl' => BDSM_APP_URL . 'build',
                     'native' => true, 'routerMode' => $mode, 'basename' => wp_parse_url(home_url('/'), PHP_URL_PATH),

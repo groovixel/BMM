@@ -1003,7 +1003,7 @@ function ConsultationModal() {
         <p>Tell us about your project and pick the service you need guidance on. Our specialist will reply within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="consultation-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>Your consultation request is in. Our specialist will be in touch shortly.</p><button onClick={closeConsult} data-testid="consultation-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="consultation-modal-form" noValidate>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="consultation-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>Your consultation request is in. Our specialist will be in touch shortly.</p><button onClick={closeConsult} data-testid="consultation-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="consultation-modal-form">
         <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="consult-name-input" /></label>
         <label className="cm-field"><span>Phone</span><input required value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="consult-phone-input" /></label>
         <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="consult-email-input" /></label>
@@ -1083,12 +1083,12 @@ function SampleModal() {
         <p data-testid="sample-modal-product">{product}{brand ? ` · ${brand}` : ""} — tell us a little about your project and we will come back with pricing and lead times within one working day. Add a delivery or site address if you would also like physical samples.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="sample-modal-success"><Check size={40} /><h3>Quote request received.</h3><p>We will come back with pricing for your {product} within one working day.</p><button onClick={closeSample} data-testid="sample-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="sample-modal-form" noValidate>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="sample-modal-success"><Check size={40} /><h3>Quote request received.</h3><p>We will come back with pricing for your {product} within one working day.</p><button onClick={closeSample} data-testid="sample-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="sample-modal-form">
         <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="sample-name-input" /></label>
         <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="sample-email-input" /></label>
         <label className="cm-field"><span>Phone</span><input required value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="sample-phone-input" /></label>
         <label className="cm-field"><span>City</span><input value={form.city} onChange={update("city")} placeholder="Jaipur" data-testid="sample-city-input" /></label>
-        <label className="cm-field cm-field--full"><span>Shipping address</span><textarea required rows={3} value={form.address} onChange={update("address")} placeholder="Studio or site address the sample should reach" data-testid="sample-address-input" /></label>
+        <label className="cm-field cm-field--full"><span>Shipping address (optional)</span><textarea rows={3} value={form.address} onChange={update("address")} placeholder="Studio or site address the sample should reach" data-testid="sample-address-input" /></label>
         <label className="cm-field"><span>Pincode</span><input value={form.pincode} onChange={update("pincode")} placeholder="302001" data-testid="sample-pincode-input" /></label>
         <label className="cm-field"><span>Notes (optional)</span><input value={form.notes} onChange={update("notes")} placeholder="Finish, thickness, timeline…" data-testid="sample-notes-input" /></label>
         {status.state === "error" && <div className="cm-error" data-testid="sample-modal-error">{status.error}</div>}
@@ -1163,7 +1163,7 @@ function InquiryModal() {
         <p data-testid="inquiry-modal-brand">Enquiring under {brand}. Tell us what you need and roughly how much — the {brand} desk replies within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="inquiry-modal-success"><Check size={40} /><h3>Inquiry sent.</h3><p>The {brand} desk will come back with pricing and availability within one working day.</p><button onClick={closeInquiry} data-testid="inquiry-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="inquiry-modal-form" noValidate>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="inquiry-modal-success"><Check size={40} /><h3>Inquiry sent.</h3><p>The {brand} desk will come back with pricing and availability within one working day.</p><button onClick={closeInquiry} data-testid="inquiry-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="inquiry-modal-form">
         <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="inquiry-name-input" /></label>
         <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="inquiry-email-input" /></label>
         <label className="cm-field"><span>Phone (optional)</span><input value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="inquiry-phone-input" /></label>
@@ -1209,7 +1209,7 @@ function ContactModal() {
       const response = await apiFetch(apiPath(`/inquiries`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), company: form.company.trim() || null, agency: form.segment || null, budget: form.budget || null, message: form.message.trim() }) });
       if (!response.ok) {
         const detail = await response.json().catch(() => ({}));
-        throw new Error(detail?.detail?.[0]?.msg || "Please double-check your details and try again.");
+        throw new Error(detail?.detail?.[0]?.msg || detail?.detail || detail?.message || "Please double-check your details and try again.");
       }
       setStatus({ state: "sent", error: "" });
       setForm({ name: "", email: "", company: "", segment: "", budget: "", message: "" });
@@ -1229,7 +1229,7 @@ function ContactModal() {
         <p>Tell us about your project — stone, flooring, construction or interiors. One team handles all of it, and we reply within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>Mumbai · Kishangarh · Gurugram</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="contact-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>The team will be in touch shortly. In the meantime, feel free to explore the projects and catalogue.</p><button onClick={() => setOpen(false)} data-testid="contact-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="contact-modal-form" noValidate>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="contact-modal-success"><Check size={40} /><h3>Thanks — we've got it.</h3><p>The team will be in touch shortly. In the meantime, feel free to explore the projects and catalogue.</p><button onClick={() => setOpen(false)} data-testid="contact-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="contact-modal-form">
         <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="contact-name-input" /></label>
         <label className="cm-field"><span>Work email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="contact-email-input" /></label>
         <label className="cm-field"><span>Company / Studio</span><input value={form.company} onChange={update("company")} placeholder="BDSM" data-testid="contact-company-input" /></label>
@@ -1467,7 +1467,7 @@ function ProductQuoteModal({ open, onClose, details }) {
         </div>
         <p>These product details are attached to your request automatically. We reply with pricing and lead times within one working day.</p>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="product-quote-success"><Check size={40} /><h3>Quote request received.</h3><p>We will come back with pricing for {details.product} within one working day.</p><button onClick={onClose} data-testid="product-quote-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="product-quote-form" noValidate>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="product-quote-success"><Check size={40} /><h3>Quote request received.</h3><p>We will come back with pricing for {details.product} within one working day.</p><button onClick={onClose} data-testid="product-quote-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="product-quote-form">
         <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="pq-name-input" /></label>
         <label className="cm-field"><span>Phone</span><input required value={form.phone} onChange={update("phone")} placeholder="+91 98xxxxxxxx" data-testid="pq-phone-input" /></label>
         <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@brand.com" data-testid="pq-email-input" /></label>
@@ -1705,7 +1705,7 @@ function BookingModal({ stay, onClose }) {
         <p>{stay.location} · from {stay.price}/night · sleeps {stay.guests}. Send your dates — we confirm availability within one working day.</p>
         <div className="contact-modal__meta"><span>info@bdsmarvel.com</span><span>{stay.location}</span></div>
       </div>
-      {status.state === "sent" ? <div className="contact-modal__success" data-testid="booking-modal-success"><Check size={40} /><h3>Request received.</h3><p>Thanks — we'll confirm availability for {stay.name} within one working day and hold your dates in the meantime.</p><button onClick={onClose} data-testid="booking-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="booking-modal-form" noValidate>
+      {status.state === "sent" ? <div className="contact-modal__success" data-testid="booking-modal-success"><Check size={40} /><h3>Request received.</h3><p>Thanks — we'll confirm availability for {stay.name} within one working day and hold your dates in the meantime.</p><button onClick={onClose} data-testid="booking-modal-done">CLOSE</button></div> : <form className="contact-modal__form" onSubmit={submit} data-testid="booking-modal-form">
         <label className="cm-field"><span>Your name</span><input ref={firstFieldRef} required value={form.name} onChange={update("name")} placeholder="Riya Kapoor" data-testid="booking-name-input" /></label>
         <label className="cm-field"><span>Email</span><input required type="email" value={form.email} onChange={update("email")} placeholder="you@email.com" data-testid="booking-email-input" /></label>
         <label className="cm-field"><span>Check-in</span><input required type="date" min={today} value={form.checkIn} onChange={update("checkIn")} data-testid="booking-checkin-input" /></label>

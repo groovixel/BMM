@@ -313,6 +313,16 @@ function bds_api($request) {
         if (strlen($request->get_body()) > 50000) { return bds_error('Please shorten the request.', 413); }
         $data = bds_clean($input);
         if (empty($data['name']) || !is_email($data['email'] ?? '')) { return bds_error('Enter your name and a valid email address.'); }
+        $required = array(
+            '/inquiries' => array('message' => 'Tell us about your project.'),
+            '/consultations' => array('phone' => 'Enter your phone number.', 'service' => 'Choose a consultation service.', 'requirements' => 'Tell us your consultation requirements.'),
+            '/sample-requests' => array('phone' => 'Enter your phone number.', 'product' => 'Choose a product.'),
+            '/product-inquiries' => array('message' => 'Tell us your product requirement.'),
+            '/quote-requests' => array('phone' => 'Enter your phone number.', 'product' => 'Choose a product.'),
+        );
+        foreach ($required[$path] as $field => $message) {
+            if (trim($data[$field] ?? '') === '') { return bds_error($message); }
+        }
         $data['id'] = wp_generate_uuid4(); $data['type'] = $types[$path]; $data['created_at'] = gmdate('c');
         if (!$wpdb->insert($wpdb->prefix . 'bds_enquiries', array('id' => $data['id'], 'type' => $data['type'], 'created_at' => current_time('mysql', true), 'data' => wp_json_encode($data)))) { return bds_error('Could not save your enquiry. Please try again.', 500); }
         bds_notify($data, 'BDS Marvel — ' . $data['type']);

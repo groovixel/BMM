@@ -50,7 +50,7 @@ check('Owner can approve request',call(owner,'/admin/bookings/'+r1['id']+'/statu
 check('Owner cannot approve overlapping request',call(owner,'/admin/bookings/'+r2['id']+'/status',{'status':'confirmed'})[0]==409)
 check('Owner can cancel booking',call(owner,'/admin/bookings/'+r1['id']+'/status',{'status':'cancelled'})[1]['status']=='cancelled')
 for endpoint in ['inquiries','consultations','sample-requests','product-inquiries','quote-requests']:
-    s,d=call(anon,'/'+endpoint,{'name':'Test Enquiry','email':'local-test@example.test','message':'LOCAL TEST','requirements':'Sample request','product':'Test product','want_sample':True})
+    s,d=call(anon,'/'+endpoint,{'name':'Test Enquiry','email':'local-test@example.test','message':'LOCAL TEST','requirements':'Sample request','phone':'0000000000','service':'Marble & Stone Consulting','product':'Test product','want_sample':True})
     check(endpoint+' saves in WordPress',s==201 and 'id' in d)
 check('Invalid enquiry email rejected',call(anon,'/inquiries',{'name':'Test','email':'broken'})[0]==422)
 s,overview=call(owner,'/admin/overview');check('Owner overview counts records',s==200 and overview['total_bookings']==baseline['total_bookings']+3 and overview['total_enquiries']==baseline['total_enquiries']+5)

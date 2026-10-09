@@ -32,9 +32,17 @@ python3 wordpress/tests/test_api.py
 
 The fixture creates a disposable test administrator and intercepts mail. Do not apply it to a real site. The test only accepts a localhost/127.0.0.1 URL and writes a JSON results file alongside itself.
 
+## Live forms verified on 9 October 2026
+
+BDS Marvel App 2.0.1 is active at https://bdsmarvel.com. All five enquiry forms were submitted through Chrome and verified in WordPress and the owner dashboard. Contact, consultation (including PNG upload), product inquiry, collection quote/sample and individual product quote passed. Owner attachment download matched the original bytes; anonymous download returned 403.
+
+Live guest registration, cookie session, logout, wrong-password rejection, login, instant booking, own-trip retrieval, duplicate-date rejection and owner authorization passed. A booking request was submitted through checkout, approved by the owner and cancelled. The instant test booking was also cancelled; zero pending/upcoming QA stays remain. The owner confirmed email receipt.
+
+Required-field validation was repaired in both React and PHP; a fresh local run passed 44 API/route checks plus 10 additional required-field/optional-address checks. The five enquiries, attachment and clearly named QA subscriber remain for audit.
+
 ## Validation limits
 
-- MySQL hosting, HTTPS/proxy configuration, real SMTP delivery and host cache behavior require staging validation.
+- Live submission, HTTPS session and email delivery were verified on WordPress.com; infrastructure and every mail provider were not independently audited.
 - No legacy Emergent database records are migrated.
 - Real payment collection and Google social login are not implemented in this WordPress version.
 - External image/map/font availability is outside the package.
