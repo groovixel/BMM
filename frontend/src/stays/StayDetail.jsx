@@ -109,6 +109,7 @@ export default function StayDetail() {
   const [shared, setShared] = useState("");
   const [amenOpen, setAmenOpen] = useState(false);
   const [navOn, setNavOn] = useState(false);
+  const [barHidden, setBarHidden] = useState(false);
   const photosRef = useRef(null);
   useEffect(() => {
     if (!photosRef.current) return undefined;
@@ -116,6 +117,14 @@ export default function StayDetail() {
     io.observe(photosRef.current);
     return () => io.disconnect();
   }, [slug]);
+  useEffect(() => {
+    if (!mobile) { setBarHidden(false); return undefined; }
+    const footer = document.querySelector(".site-footer");
+    if (!footer) return undefined;
+    const io = new IntersectionObserver(([e]) => setBarHidden(e.isIntersecting));
+    io.observe(footer);
+    return () => io.disconnect();
+  }, [mobile, slug]);
   usePageTitle(stay ? `${stay.name} · ${stay.location} | BDSM Stays` : "Stay not found");
   const similar = useMemo(() => (stay ? getStays().filter((s) => s.tierSlug === stay.tierSlug && s.slug !== stay.slug).slice(0, 3) : []), [stay]);
   if (!stay) return <main className="sx-page sx-center"><div className="sx-empty" data-testid="stay-not-found"><h2>We couldn't find that stay</h2><Link className="sx-btn sx-btn--primary" to="/stays/search">Browse all stays</Link></div></main>;
@@ -179,7 +188,7 @@ export default function StayDetail() {
         {!mobile && <aside className="sx-detail__aside"><BookingPanel stay={stay} booked={avail.booked} onGo={goCheckout} /></aside>}
       </div>
     </div>
-    {mobile && <div className="sx-mbar" data-testid="mobile-booking-bar"><div><b>{nights ? inr(stay.nightly * nights) : inr(stay.nightly)}</b> {nights ? `for ${nights} night${nights > 1 ? "s" : ""}` : "night"}<span className="sx-u">{nights ? fmtRange(search.checkIn, search.checkOut) : "Add dates"}</span></div><button type="button" className="sx-btn sx-btn--primary" onClick={() => setSheet(true)} data-testid="mobile-reserve">Reserve</button></div>}
+    {mobile && <div className={`sx-mbar ${barHidden ? "sx-mbar--hidden" : ""}`} data-testid="mobile-booking-bar"><div><b>{nights ? inr(stay.nightly * nights) : inr(stay.nightly)}</b> {nights ? `for ${nights} night${nights > 1 ? "s" : ""}` : "night"}<span className="sx-u">{nights ? fmtRange(search.checkIn, search.checkOut) : "Add dates"}</span></div><button type="button" className="sx-btn sx-btn--primary" onClick={() => setSheet(true)} data-testid="mobile-reserve">Reserve</button></div>}
     <Modal open={sheet} onClose={() => setSheet(false)} title="Your trip" testId="mobile-booking-sheet"><BookingPanel stay={stay} booked={avail.booked} onGo={(m) => { setSheet(false); goCheckout(m); }} /></Modal>
     <Modal open={!!authFor} onClose={() => setAuthFor(null)} title="Sign in to book" testId="reserve-auth-modal">
       <p className="sx-note" data-testid="reserve-auth-note">Sign in to confirm your booking — your dates and guests are saved.</p>
