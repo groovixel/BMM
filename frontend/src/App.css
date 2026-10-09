@@ -79,12 +79,18 @@
 .contact-page__hero h1 em{font-style:italic;font-weight:200;color:var(--paper)}
 .contact-page__body{display:grid;grid-template-columns:1.05fr 1.35fr;gap:70px;align-items:start}
 .contact-cities{display:flex;flex-direction:column;gap:0}
-.contact-city{display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;border-bottom:1px solid #ffffff22;padding:26px 6px;color:var(--paper);font-size:22px;letter-spacing:.14em;cursor:pointer;transition:padding-left .25s ease,color .2s ease}
+.contact-accordion-item{border-bottom:1px solid #ffffff22}
+.contact-city{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;padding:26px 6px;color:var(--paper);font-size:22px;letter-spacing:.14em;cursor:pointer;transition:padding-left .25s ease,color .2s ease}
 .contact-city__code{font-family:'Outfit',sans-serif;font-weight:400}
 .contact-city svg{opacity:.55;transition:transform .25s ease,opacity .25s ease}
 .contact-city:hover{padding-left:16px}
-.contact-city:hover svg{transform:translateX(4px);opacity:1}
-.contact-city--active svg{opacity:1;transform:translateX(6px)}
+.contact-city:hover svg{opacity:1}
+.contact-city--active{color:var(--acid)}
+.contact-city--active svg{opacity:1;transform:rotate(180deg)}
+.contact-accordion-panel{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows .5s cubic-bezier(.22,.8,.24,1),opacity .3s ease,visibility 0s linear .5s}
+.contact-accordion-item--active .contact-accordion-panel{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .5s cubic-bezier(.22,.8,.24,1),opacity .42s ease .08s,visibility 0s linear 0s}
+.contact-accordion-panel__inner{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:18px;padding:0 6px 30px}
+.contact-accordion-panel__inner .contact-detail__cta{font-size:14px;padding:14px 20px}
 .contact-page__info{margin-top:44px;display:flex;flex-direction:column;gap:2px;color:#ffffffcc;font-size:16px}
 .contact-page__info a{color:inherit;text-decoration:none;transition:color .2s ease}
 .contact-page__info a:hover{color:var(--acid)}

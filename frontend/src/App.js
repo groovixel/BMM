@@ -1798,15 +1798,23 @@ function ContactPage() {
     { code: "GOA", brand: "LIVING STUDIO", city: "Goa", address: "BDSM Living Studio · Assagao, Bardez, North Goa 403507" },
   ];
   const [active, setActive] = useState(0);
-  const current = cities[active];
   return <main className="contact-page" data-testid="contact-page">
     <section className="contact-page__hero"><h1>Come see<br /><em>the material.</em></h1></section>
     <section className="contact-page__body">
       <div className="contact-cities" data-testid="contact-cities">
-        {cities.map((city, index) => <button key={city.code} className={`contact-city ${index === active ? "contact-city--active" : ""}`} onClick={() => setActive(index)} data-testid={`contact-city-${city.code}`}>
-          <span className="contact-city__code">{city.brand}</span>
-          <ChevronRight size={18} />
-        </button>)}
+        {cities.map((city, index) => <div className={`contact-accordion-item ${index === active ? "contact-accordion-item--active" : ""}`} key={city.code} data-testid={`contact-accordion-item-${city.code}`}>
+          <button className={`contact-city ${index === active ? "contact-city--active" : ""}`} onClick={() => setActive(index)} aria-expanded={index === active} aria-controls={`contact-panel-${city.code}`} data-testid={`contact-city-${city.code}`}>
+            <span className="contact-city__code">{city.brand}</span>
+            <ChevronDown size={18} />
+          </button>
+          <div className="contact-accordion-panel" id={`contact-panel-${city.code}`} aria-hidden={index !== active} data-testid={`contact-panel-${city.code}`}>
+            <div className="contact-accordion-panel__inner">
+              <p className="contact-detail__location" data-testid={`active-city-name-${city.code}`}>{city.city}</p>
+              <p className="contact-detail__address" data-testid={`active-city-address-${city.code}`}>{city.address}</p>
+              <button className="contact-detail__cta" onClick={() => setOpen(true)} data-testid={`contact-get-in-touch-${city.code}`}>Get in Touch <ArrowUpRight size={16} /></button>
+            </div>
+          </div>
+        </div>)}
         <div className="contact-page__info">
           <a href="mailto:info@bdsmarvel.com" data-testid="press-email">info@bdsmarvel.com</a>
           <a href="mailto:info.bdsmarvel@gmail.com" data-testid="bd-email">info.bdsmarvel@gmail.com</a>
@@ -1821,9 +1829,6 @@ function ContactPage() {
         </div>
       </div>
       <div className="contact-detail">
-        <p className="contact-detail__location" data-testid="active-city-name">{current.city}</p>
-        <p className="contact-detail__address" data-testid="active-city-address">{current.address}</p>
-        <button className="contact-detail__cta" onClick={() => setOpen(true)} data-testid="contact-get-in-touch">Get in Touch <ArrowUpRight size={16} /></button>
         <div className="contact-monument" aria-hidden="true">
           <svg viewBox="0 0 620 320" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
             <g fill="none" stroke="#2b2b2b" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
