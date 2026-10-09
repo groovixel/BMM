@@ -755,8 +755,8 @@ function ExperienceSpotlight() {
         <p data-testid="experience-spotlight-description">{livingStudio.body}</p>
         <ul data-testid="experience-spotlight-details">{livingStudio.details.map((detail, index) => <li key={detail} style={{ "--i": index }}>{detail}</li>)}</ul>
         <div className="experience-spotlight__actions">
-          <Link to="/experience" className="np-btn np-btn--solid" data-testid="experience-spotlight-explore">EXPLORE THE STAY <ArrowUpRight size={16} /></Link>
-          <Link to="/stays?start=where" className="np-btn np-btn--ghost" data-testid="experience-spotlight-request">REQUEST A NIGHT <ArrowUpRight size={16} /></Link>
+          <Link to="/stays?start=where" className="np-btn np-btn--solid" data-testid="experience-spotlight-explore">EXPLORE THE STAY <ArrowUpRight size={16} /></Link>
+          <Link to="/experience" className="np-btn np-btn--ghost" data-testid="experience-spotlight-request">REQUEST A NIGHT <ArrowUpRight size={16} /></Link>
         </div>
       </div>
     </div>
