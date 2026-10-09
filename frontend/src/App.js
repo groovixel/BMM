@@ -811,7 +811,7 @@ function Footer() {
         <button onClick={() => jump("network")} data-testid="footer-link-agencies">what we do</button>
         <button onClick={() => { navigate("/projects"); }} data-testid="footer-link-projects">projects</button>
         <button onClick={() => { navigate("/catalogue"); }} data-testid="footer-link-catalogue">catalogue</button>
-        <button onClick={() => { navigate("/experience"); }} data-testid="footer-link-bnb">air bnb</button>
+        <button onClick={() => { navigate("/stays"); }} data-testid="footer-link-bnb">air bnb</button>
         <button onClick={() => { navigate("/contact"); }} data-testid="footer-link-contact">contact</button>
       </nav>
       <div className="site-footer__socials">
