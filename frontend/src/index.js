@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@/index.css";
-import App from "@/App";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,10 +15,11 @@ const queryClient = new QueryClient({
 
 const mountNode = document.getElementById("bdsm-marvel-root") || document.getElementById("root");
 const root = ReactDOM.createRoot(mountNode);
-root.render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </React.StrictMode>,
-);
+async function start() {
+  // WordPress injects the current public content into BDS_WORDPRESS during
+  // page rendering. Mount immediately instead of waiting for a duplicate API
+  // request before showing the homepage.
+  const { default: App } = await import('@/App');
+  root.render(<React.StrictMode><QueryClientProvider client={queryClient}><App /></QueryClientProvider></React.StrictMode>);
+}
+start();

@@ -10,6 +10,7 @@
 .sx-spin{animation:sx-spin .8s linear infinite}
 @keyframes sx-spin{to{transform:rotate(360deg)}}
 .sx-note{font-size:13px;color:var(--sx-muted);margin:10px 0 0;line-height:1.45}
+.sx-kicker{font:500 10px/1.3 "DM Mono",monospace;letter-spacing:.14em;color:var(--sx-muted);text-transform:uppercase}
 .sx-error{color:#b3261e;font-size:14px;margin:10px 0 0;background:#fbe9e7;padding:10px 12px;border-radius:10px}
 .sx-banner{background:#f8edd8;border:1px solid #ecd9b3;padding:10px 14px;border-radius:12px;font-size:14px;margin:0 0 18px}
 .sx-u{text-decoration:underline;text-underline-offset:3px;color:inherit;font-weight:500}
@@ -82,12 +83,14 @@
 .sx-acc__body::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;background:linear-gradient(140deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.08) 38%,rgba(255,255,255,0) 60%)}
 
 /* Calendar */
-.sx-cal{position:relative;background:#171613;color:#f4efe6;border-radius:16px;padding:24px 18px 16px}
-.sx-cal__nav{position:absolute;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;pointer-events:none;z-index:1}
-.sx-cal__nav button{pointer-events:auto}
-.sx-cal__months{display:grid;gap:44px}
-.sx-cal__month h4{text-align:center;font-size:16px;font-weight:600;color:#f4efe6;margin:0 42px 16px}
-.sx-cal__grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px}
+.sx-cal{position:relative;width:100%;max-width:100%;box-sizing:border-box;background:#171613;color:#f4efe6;border-radius:16px;padding:16px 18px}
+.sx-cal__months{display:grid;width:100%;min-width:0;gap:44px}
+.sx-cal__month{width:100%;min-width:0}
+.sx-cal__month-head{display:grid;width:100%;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;min-height:32px;margin-bottom:12px}
+.sx-cal__month-head h4{text-align:center;font-size:16px;font-weight:600;color:#f4efe6;margin:0;white-space:nowrap}
+.sx-cal__month-head .sx-icon-btn{width:32px;height:32px;padding:0}
+.sx-cal__month-head .sx-icon-btn:only-child{grid-column:1}
+.sx-cal__grid{display:grid;width:100%;grid-template-columns:repeat(7,minmax(0,1fr));row-gap:2px}
 .sx-cal__wd{font-size:12px;color:#a9a397;text-align:center;padding-bottom:8px}
 .sx-cal__day{aspect-ratio:1;max-height:48px;border:0;background:transparent;padding:0;cursor:pointer;font:500 14px 'Outfit',sans-serif;color:#fff;position:relative;display:grid;place-items:center}
 .sx-cal__day span{width:100%;height:100%;max-width:46px;max-height:46px;border-radius:50%;display:grid;place-items:center;border:1.5px solid transparent;transition:border-color .15s ease,background-color .15s ease,color .15s ease}
@@ -100,10 +103,6 @@
 .sx-cal__day.is-end{background:linear-gradient(90deg,rgba(201,162,98,.25) 50%,transparent 50%)}
 .sx-cal__day.is-edge span{background:var(--sx-gold);color:#171613}
 .sx-cal__day.is-unavailable.is-edge span{background:#2c2a26;color:#96928a}
-.sx-cal__legend{display:flex;justify-content:center;gap:20px;padding-top:14px;color:#f4efe6;font-size:12px}
-.sx-cal__legend span{display:inline-flex;align-items:center;gap:7px}
-.sx-cal__legend i{width:9px;height:9px;border-radius:50%;background:#fff}
-.sx-cal__legend i.is-unavailable{background:#96928a}
 
 /* Guests */
 .sx-guests__row{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--sx-line)}
@@ -377,6 +376,25 @@
 .sx-review-step .sx-toggle{margin:18px 0 6px}
 .sx-step__body>.sx-btn{margin-top:16px}
 .sx-co__summary{position:sticky;top:96px;border:1px solid var(--sx-line);border-radius:20px;padding:24px;background:var(--sx-surface);display:flex;flex-direction:column;gap:18px}
+.sx-page--payment{min-height:75vh}
+.sx-pay-card{border:1px solid var(--sx-line);border-radius:20px;padding:clamp(22px,4vw,34px);background:var(--sx-surface);box-shadow:var(--sx-shadow)}
+.sx-pay-card__brand{display:flex;align-items:center;gap:13px;margin-bottom:24px}
+.sx-pay-card__brand h2,.sx-pay-aside h2{font:600 24px/1.15 "Fraunces",serif;margin:3px 0 0}
+.sx-pay-card__mark{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--sx-ink);color:var(--sx-gold);font:600 21px "Fraunces",serif}
+.sx-pay-card .sx-co__stay{grid-template-columns:96px 1fr;padding-bottom:20px}
+.sx-pay-card .sx-co__stay img{width:96px;height:82px}
+.sx-pay-details{margin:20px 0;display:grid;gap:15px}
+.sx-pay-details>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.sx-pay-details dt{color:var(--sx-muted);font-size:14px}
+.sx-pay-details dd{margin:0;text-align:right;font-weight:500}
+.sx-pay-details .sx-pay-total{border-top:1px solid var(--sx-line);padding-top:16px;margin-top:4px}
+.sx-pay-total dt,.sx-pay-total dd{font-size:18px;font-weight:600;color:var(--sx-ink)}
+.sx-pay-secure{border-block:1px solid var(--sx-line);padding:14px 0;display:flex;align-items:center;gap:9px;color:var(--sx-muted);font-size:13px}
+.sx-pay-secure svg:first-child{color:#627a55}.sx-pay-secure svg:last-child{margin-left:auto}
+.sx-pay-button{width:100%;margin-top:18px;display:flex;justify-content:center;align-items:center;gap:10px}
+.sx-pay-arrow{transform:rotate(135deg)}
+.sx-pay-foot{display:flex;align-items:center;justify-content:center;gap:6px;color:var(--sx-muted);font-size:12px;margin:14px 0 0}
+.sx-pay-aside h2{margin:0}.sx-pay-aside p{line-height:1.55;color:var(--sx-muted);margin:0}
 .sx-co__stay{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--sx-line)}
 .sx-co__stay img{width:110px;height:96px;object-fit:cover;border-radius:12px}
 .sx-co__stay div{display:flex;flex-direction:column;gap:3px;font-size:14px}

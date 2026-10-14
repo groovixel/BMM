@@ -1,0 +1,13 @@
+/*
+Theme Name: BDS Marvel
+Description: The complete BMM design, powered by the BDS Marvel App companion plugin. Includes clean routes and standard WordPress page templates.
+Version: 2.0.2
+Requires at least: 6.5
+Requires PHP: 7.4
+Author: BDS Marvel
+License: GPL-2.0-or-later
+Text Domain: bds-marvel
+*/
+body { margin: 0; }
+.bds-document { max-width: 960px; margin: 80px auto; padding: 24px; font: 18px/1.7 system-ui,sans-serif; }
+.bds-document img { max-width: 100%; height: auto; }

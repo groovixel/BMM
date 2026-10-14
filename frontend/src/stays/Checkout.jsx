@@ -11,7 +11,7 @@ import { usePageTitle } from "./usePageTitle";
 const DRAFT_KEY = "bds_checkout_draft";
 const readDraft = () => { try { return JSON.parse(sessionStorage.getItem(DRAFT_KEY)) || {}; } catch { return {}; } };
 
-function Summary({ stay, search, nights }) {
+function Summary({ stay, search, nights, paymentsEnabled }) {
   return <aside className="sx-co__summary" data-testid="checkout-summary">
     <div className="sx-co__stay"><img src={img(stay.hero, 400)} alt={stay.name} /><div><strong>{stay.name}</strong><span className="sx-muted">{stay.type} in {stay.location}</span><Rating stay={stay} /></div></div>
     <div className="sx-co__trip"><div><span>Dates</span><strong data-testid="summary-dates">{fmtRange(search.checkIn, search.checkOut) || "Add dates"}</strong></div><div><span>Guests</span><strong data-testid="summary-guests">{guestLabel(search) || "Add guests"}</strong></div></div>
@@ -21,7 +21,7 @@ function Summary({ stay, search, nights }) {
       <div className="sx-muted"><span>Taxes</span><span>As applicable, at property</span></div>
       <div className="sx-lines__total"><span>Total (INR)</span><span data-testid="summary-total">{inr(stay.nightly * nights)}</span></div>
     </div>
-    <p className="sx-note">Payment: online payment isn't enabled yet — you settle directly with the host at the property.</p>
+    <p className="sx-note">{paymentsEnabled ? "Pay securely online with Razorpay. We’ll confirm your reservation after payment is verified." : "No payment is collected now. Send your request and the host will review it within one working day."}</p>
   </aside>;
 }
 
@@ -30,6 +30,7 @@ export default function Checkout() {
   const [params] = useSearchParams();
   const stay = getStay(slug);
   const mode = stay?.bookingMode === "instant" ? "instant" : "request";
+  const paymentsEnabled = window.BDS_WORDPRESS?.paymentsEnabled === true;
   const navigate = useNavigate();
   const { user } = useAuth();
   const { search, setSearch } = useStays();
@@ -65,9 +66,7 @@ export default function Checkout() {
     if (!draft.agree) { setStatus({ busy: false, error: "Please accept the house rules and cancellation policy." }); return; }
     setStatus({ busy: true, error: "" });
     try {
-      const booking = await api("/stays/bookings", { method: "POST", body: { stay_slug: stay.slug, check_in: search.checkIn, check_out: search.checkOut, adults: search.adults, children: search.children, infants: search.infants, pets: search.pets, name: draft.name.trim(), email: draft.email.trim(), phone: draft.phone.trim(), message: draft.message.trim() || null } });
-      sessionStorage.removeItem(DRAFT_KEY);
-      navigate(`/stays/trips/${booking.id}`, { replace: true, state: { booking } });
+      navigate(`/stays/payment/${stay.slug}`);
     } catch (e) {
       if (e.status === 401) { setDraft((d) => ({ ...d, step: "account" })); setStatus({ busy: false, error: "Please sign in again to finish your booking." }); return; }
       setStatus({ busy: false, error: e.message });
@@ -100,18 +99,18 @@ export default function Checkout() {
                 {s === "review" && <div className="sx-review-step">
                   <h3>Cancellation policy {POLICIES.draft && <span className="sx-pilltag sx-pilltag--muted">Host to confirm</span>}</h3><p>{POLICIES.cancellation}</p>
                   <h3>Ground rules</h3><p>Check-in after {POLICIES.checkIn} · checkout before {POLICIES.checkOut}. {POLICIES.rules.join(" · ")}.</p>
-                  <h3>Payment</h3><p>No online payment is taken. {mode === "instant" ? "Your reservation is confirmed the moment we verify the dates are free" : "Your dates are requested — the host reviews and replies within one working day"}; you pay at the property.</p>
+                  <h3>Payment</h3><p>{paymentsEnabled ? <>Pay securely in Indian rupees using Razorpay. {mode === "instant" ? "Your reservation is confirmed after payment is verified." : "Your paid request is sent to the host for approval; we’ll contact you within one working day."}</> : "Online payment is not configured yet. No payment will be collected; this will be sent to the host as a booking request for approval."}</p>
                   <label className="sx-toggle"><input type="checkbox" checked={draft.agree} onChange={(e) => setDraft({ ...draft, agree: e.target.checked })} data-testid="checkout-agree" /><span>I agree to the house rules, cancellation policy and BDS Marvel's booking terms.</span></label>
                 </div>}
                 {status.error && <p className="sx-error" role="alert" data-testid="checkout-error">{status.error}</p>}
                 {s !== "account" && (s === "review"
-                  ? <button type="button" className="sx-btn sx-btn--primary sx-btn--lg" onClick={submit} disabled={status.busy} data-testid="checkout-submit">{status.busy ? <><Loader2 size={16} className="sx-spin" /> {mode === "request" ? "Sending request…" : "Checking availability…"}</> : mode === "request" ? "Send booking request" : "Confirm and book"}</button>
+                  ? <button type="button" className="sx-btn sx-btn--primary sx-btn--lg" onClick={submit} disabled={status.busy} data-testid="checkout-submit">{status.busy ? <><Loader2 size={16} className="sx-spin" /> {paymentsEnabled ? "Preparing secure payment…" : "Sending request…"}</> : paymentsEnabled ? <>Continue to payment · {inr(stay.nightly * nights)}</> : <>Send booking request</>}</button>
                   : <button type="button" className="sx-btn sx-btn--dark" onClick={next} data-testid={`checkout-next-${s}`}>Continue</button>)}
               </motion.div>}</AnimatePresence>
             </section>;
           })}
         </div>
-        <Summary stay={stay} search={search} nights={nights} />
+        <Summary stay={stay} search={search} nights={nights} paymentsEnabled={paymentsEnabled} />
       </div>
     </div>
     <Modal open={edit === "dates"} onClose={() => setEdit(null)} title="Change dates" size="lg" testId="edit-dates-modal" footer={<><button type="button" className="sx-link" onClick={() => setSearch({ checkIn: "", checkOut: "" })}>Clear dates</button><button type="button" className="sx-btn sx-btn--dark" onClick={() => setEdit(null)} data-testid="edit-dates-save">Save</button></>}>

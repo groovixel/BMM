@@ -17,6 +17,7 @@ const StaysHome = lazy(() => import("./stays/StaysHome"));
 const StaysSearch = lazy(() => import("./stays/StaysSearch"));
 const StayDetail = lazy(() => import("./stays/StayDetail"));
 const Checkout = lazy(() => import("./stays/Checkout"));
+const StayPayment = lazy(() => import("./stays/Payment"));
 const TripStatus = lazy(() => import("./stays/TripStatus"));
 const MyTrips = lazy(() => import("./stays/MyTrips"));
 const Account = lazy(() => import("./stays/Account"));
@@ -1738,11 +1739,11 @@ function StayCard({ stay, index, onBook }) {
 }
 
 function StaysPage() {
-  usePageMeta("Stays & BnBs | BDSM · BDS Marvel", "Explore BDSM · BDS Marvel stays — premium, mid and budget-friendly BnBs across India. Book a night directly.");
+  usePageMeta("Stays & BnBs | BDSM · BDS Marvel", "Explore BDSM · BDS Marvel stays — premium, mid and budget-friendly BnBs across India. Book a night with secure online payment.");
   return <main className="stays-page" data-testid="stays-page">
     <section className="stays-hero">
       <div className="detail-kicker"><span>BDSM · STAYS</span><Link to="/experience" state={{ restore: true }} data-testid="stays-back-link">THE LIVING STUDIO</Link></div>
-      <div className="stays-hero__copy"><p className="eyebrow">AIR BNB · THREE CATEGORIES</p><h1>Explore our BnBs.<br /><em>Book your night.</em></h1><p>Fifteen stays across three categories — premium homes where you experience our work first-hand, easy mid-range city apartments, and honest budget-friendly rooms. Pick a category, choose your dates, and we confirm within one working day.</p></div>
+      <div className="stays-hero__copy"><p className="eyebrow">AIR BNB · THREE CATEGORIES</p><h1>Explore our BnBs.<br /><em>Book your night.</em></h1><p>Fifteen stays across three categories — premium homes where you experience our work first-hand, easy mid-range city apartments, and honest budget-friendly rooms. Pick your dates and guests, then pay securely online.</p></div>
     </section>
     <section className="experience-tiers" data-testid="stays-tier-index">
       <div className="experience-tiers__grid">
@@ -1766,9 +1767,9 @@ function StaysPage() {
 
 function StaysCategoryPage() {
   const { tier } = useParams();
+  const navigate = useNavigate();
   const meta = stayTiers.find((item) => item.slug === tier);
   const tierStays = stays.filter((stay) => tierSlugOf(stay.tier) === tier);
-  const [booking, setBooking] = useState(null);
   usePageMeta(meta ? `${meta.name} Stays | BDSM · BDS Marvel` : "Stays | BDSM · BDS Marvel", meta ? `${meta.headline} ${meta.copy}` : "Explore BDSM · BDS Marvel stays.");
   if (!meta) return <Navigate to="/stays" replace />;
   return <main className="stays-page" data-testid="stays-category-page">
@@ -1777,9 +1778,8 @@ function StaysCategoryPage() {
       <div className="stays-hero__copy"><p className="eyebrow">{tierStays.length} STAYS</p><h1>{meta.headline.replace(/\.$/, "")}<br /><em>Pick your stay.</em></h1></div>
     </section>
     <section className="stays-list" data-testid="stays-list">
-      {tierStays.map((stay, index) => <StayCard key={stay.slug} stay={stay} index={index} onBook={setBooking} />)}
+      {tierStays.map((stay, index) => <StayCard key={stay.slug} stay={stay} index={index} onBook={(selected) => navigate(`/stays/home/${selected.slug}`)} />)}
     </section>
-    <BookingModal stay={booking} onClose={() => setBooking(null)} />
   </main>;
 }
 
@@ -1975,6 +1975,7 @@ function AppRoutes() {
           <Route path="/stays/search" element={<StaysSearch />} />
           <Route path="/stays/home/:slug" element={<StayDetail />} />
           <Route path="/stays/book/:slug" element={<Checkout />} />
+          <Route path="/stays/payment/:slug" element={<StayPayment />} />
           <Route path="/stays/trips" element={<MyTrips />} />
           <Route path="/stays/account" element={<Account />} />
           <Route path="/stays/trips/:id" element={<TripStatus />} />

@@ -96,15 +96,15 @@ export function RangeCalendar({ checkIn, checkOut, onChange, booked = [], months
   };
   const shift = (n) => setCursor(({ y, m }) => { const d = new Date(y, m + n, 1); return { y: d.getFullYear(), m: d.getMonth() }; });
   return <div className="sx-cal" data-testid={testId}>
-    <div className="sx-cal__nav">
-      <button type="button" className="sx-icon-btn" onClick={() => shift(-1)} disabled={!canPrev} aria-label="Previous month" data-testid={`${testId}-prev`}><ChevronLeft size={16} /></button>
-      <button type="button" className="sx-icon-btn" onClick={() => shift(1)} aria-label="Next month" data-testid={`${testId}-next`}><ChevronRight size={16} /></button>
-    </div>
     <div className="sx-cal__months" style={{ gridTemplateColumns: `repeat(${months}, 1fr)` }}>
       {Array.from({ length: months }, (_, k) => {
         const d = new Date(cursor.y, cursor.m + k, 1);
         return <div className="sx-cal__month" key={k}>
-          <h4>{d.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}</h4>
+          <div className="sx-cal__month-head">
+            {k === 0 && <button type="button" className="sx-icon-btn" onClick={() => shift(-1)} disabled={!canPrev} aria-label="Previous month" data-testid={`${testId}-prev`}><ChevronLeft size={16} /></button>}
+            <h4>{d.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}</h4>
+            {k === months - 1 && <button type="button" className="sx-icon-btn" onClick={() => shift(1)} aria-label="Next month" data-testid={`${testId}-next`}><ChevronRight size={16} /></button>}
+          </div>
           <div className="sx-cal__grid" role="grid">
             {WEEK.map((w, i) => <span className="sx-cal__wd" key={i}>{w}</span>)}
             {monthDays(d.getFullYear(), d.getMonth()).map((day, i) => {
@@ -122,10 +122,6 @@ export function RangeCalendar({ checkIn, checkOut, onChange, booked = [], months
           </div>
         </div>;
       })}
-    </div>
-    <div className="sx-cal__legend" aria-live="polite">
-      <span><i className="is-available" />Available</span>
-      <span><i className="is-unavailable" />{availabilityReady ? "Unavailable" : "Checking availability…"}</span>
     </div>
   </div>;
 }

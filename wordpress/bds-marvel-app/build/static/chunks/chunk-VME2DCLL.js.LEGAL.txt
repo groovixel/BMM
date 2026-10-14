@@ -1,0 +1,75 @@
+Bundled license information:
+
+lucide-react/dist/esm/shared/src/utils.js:
+lucide-react/dist/esm/defaultAttributes.js:
+lucide-react/dist/esm/Icon.js:
+lucide-react/dist/esm/createLucideIcon.js:
+lucide-react/dist/esm/icons/arrow-down.js:
+lucide-react/dist/esm/icons/arrow-left.js:
+lucide-react/dist/esm/icons/arrow-up-right.js:
+lucide-react/dist/esm/icons/arrow-up.js:
+lucide-react/dist/esm/icons/bath.js:
+lucide-react/dist/esm/icons/bed-double.js:
+lucide-react/dist/esm/icons/calendar-check.js:
+lucide-react/dist/esm/icons/car.js:
+lucide-react/dist/esm/icons/check.js:
+lucide-react/dist/esm/icons/chevron-down.js:
+lucide-react/dist/esm/icons/chevron-left.js:
+lucide-react/dist/esm/icons/chevron-right.js:
+lucide-react/dist/esm/icons/clock.js:
+lucide-react/dist/esm/icons/facebook.js:
+lucide-react/dist/esm/icons/flag.js:
+lucide-react/dist/esm/icons/flame.js:
+lucide-react/dist/esm/icons/grid-3x3.js:
+lucide-react/dist/esm/icons/heart.js:
+lucide-react/dist/esm/icons/instagram.js:
+lucide-react/dist/esm/icons/key-round.js:
+lucide-react/dist/esm/icons/library.js:
+lucide-react/dist/esm/icons/linkedin.js:
+lucide-react/dist/esm/icons/loader-circle.js:
+lucide-react/dist/esm/icons/lock-keyhole.js:
+lucide-react/dist/esm/icons/log-out.js:
+lucide-react/dist/esm/icons/luggage.js:
+lucide-react/dist/esm/icons/map-pin.js:
+lucide-react/dist/esm/icons/message-square-heart.js:
+lucide-react/dist/esm/icons/search.js:
+lucide-react/dist/esm/icons/share.js:
+lucide-react/dist/esm/icons/shield-check.js:
+lucide-react/dist/esm/icons/sliders-horizontal.js:
+lucide-react/dist/esm/icons/sofa.js:
+lucide-react/dist/esm/icons/tag.js:
+lucide-react/dist/esm/icons/trees.js:
+lucide-react/dist/esm/icons/twitter.js:
+lucide-react/dist/esm/icons/user.js:
+lucide-react/dist/esm/icons/users.js:
+lucide-react/dist/esm/icons/utensils-crossed.js:
+lucide-react/dist/esm/icons/waves.js:
+lucide-react/dist/esm/icons/wifi.js:
+lucide-react/dist/esm/icons/x.js:
+lucide-react/dist/esm/icons/youtube.js:
+lucide-react/dist/esm/icons/building-2.js:
+lucide-react/dist/esm/icons/history.js:
+lucide-react/dist/esm/icons/locate-fixed.js:
+lucide-react/dist/esm/icons/minus.js:
+lucide-react/dist/esm/icons/plus.js:
+lucide-react/dist/esm/icons/refresh-cw.js:
+lucide-react/dist/esm/lucide-react.js:
+  /**
+   * @license lucide-react v0.516.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   */
+
+react-router/dist/development/chunk-62JRHF6Z.mjs:
+react-router/dist/development/index.mjs:
+  /**
+   * react-router v7.18.2
+   *
+   * Copyright (c) Remix Software Inc.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE.md file in the root directory of this source tree.
+   *
+   * @license MIT
+   */

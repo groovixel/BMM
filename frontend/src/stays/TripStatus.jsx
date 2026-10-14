@@ -24,14 +24,24 @@ export default function TripStatus() {
   const b = state.booking;
   const stay = getStay(b.stay_slug);
   const confirmed = b.status === "confirmed";
-  const steps = confirmed
-    ? ["We've emailed the host your reservation details.", `Check in from ${POLICIES.checkIn} on ${fmtLong(b.check_in)} — the exact address and arrival notes follow by email.`, "Pay the host at the property. No online charge has been made."]
-    : ["The host reviews your request and replies within one working day.", "Your request isn't a confirmed booking yet — the dates may still be confirmed for someone else.", "Once approved, you'll get the address and arrival notes. Payment is at the property."];
+  const paymentConflict = b.status === "payment_conflict";
+  const declined = b.status === "declined";
+  const paid = ["paid", "paid_conflict", "refund_pending", "refund_failed"].includes(b.payment_status);
+  const unpaidRequest = b.status === "requested" && !paid;
+  const steps = paymentConflict
+    ? ["Your payment was received, but another reservation overlaps these dates.", "Please contact BDS Marvel with your booking reference so we can arrange a refund."]
+    : declined
+      ? [b.payment_status === "refund_pending" ? "The host declined this request and a refund has been requested from Razorpay." : b.payment_status === "refund_failed" ? "The host declined this request. Please contact BDS Marvel to arrange your refund." : "The host declined this request.", "Refund timing depends on your bank or payment method."]
+    : confirmed
+      ? ["Your payment is verified and the host has your reservation details.", `Check in from ${POLICIES.checkIn} on ${fmtLong(b.check_in)} — the exact address and arrival notes follow by email.`, "Your stay is paid in full online."]
+      : unpaidRequest
+      ? ["Your booking request was sent to the host for review.", "No payment was collected. The host will contact you within one working day.", "Your stay is not confirmed until the host approves it."]
+      : ["Your payment is verified and the host reviews your request within one working day.", "This paid request is not confirmed yet; the host will contact you with the decision.", "If the host cannot accept your dates, BDS Marvel will contact you about the refund."];
   return <main className="sx-page sx-page--trip" data-testid="trip-status">
     <motion.div className="sx-wrap sx-trip-wrap" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <div className={`sx-status sx-status--${confirmed ? "ok" : "pending"}`} data-testid={`trip-status-${b.status}`}>
         {confirmed ? <CalendarCheck size={28} /> : <Clock size={28} />}
-        <div><h1>{confirmed ? "You're booked!" : "Request sent — pending host approval"}</h1><p>Booking reference <strong data-testid="trip-reference">{b.reference}</strong></p></div>
+        <div><h1>{paymentConflict ? "Payment needs attention" : declined ? "Request declined" : confirmed ? "You're booked!" : unpaidRequest ? "Booking request sent" : "Paid request — pending host approval"}</h1><p>Booking reference <strong data-testid="trip-reference">{b.reference}</strong></p></div>
       </div>
       <div className="sx-trip-card">
         {stay && <img src={img(stay.hero, 900)} alt={stay.name} />}
@@ -42,7 +52,8 @@ export default function TripStatus() {
             <div><dt>Checkout</dt><dd data-testid="trip-checkout">{fmtLong(b.check_out)}</dd></div>
             <div><dt>Guests</dt><dd>{b.guests} guest{b.guests > 1 ? "s" : ""}{b.infants ? `, ${b.infants} infant${b.infants > 1 ? "s" : ""}` : ""}{b.pets ? `, ${b.pets} pet${b.pets > 1 ? "s" : ""}` : ""}</dd></div>
             <div><dt>Total</dt><dd data-testid="trip-total">{inr(b.total)} · {b.nights} night{b.nights > 1 ? "s" : ""}</dd></div>
-            <div><dt>Status</dt><dd><span className={`sx-pilltag ${confirmed ? "" : "sx-pilltag--muted"}`}>{confirmed ? "Confirmed" : "Awaiting host"}</span></dd></div>
+            <div><dt>Payment</dt><dd><span className={`sx-pilltag ${paid ? "" : "sx-pilltag--muted"}`}>{paymentConflict ? "Paid · contact us" : b.payment_status === "refund_pending" ? "Refund requested" : b.payment_status === "refund_failed" ? "Refund needs attention" : paid ? "Paid online" : b.payment_status === "not_required" ? "No payment collected" : b.payment_status || "Unpaid"}</span></dd></div>
+            <div><dt>Status</dt><dd><span className={`sx-pilltag ${confirmed ? "" : "sx-pilltag--muted"}`}>{paymentConflict ? "Needs review" : declined ? "Declined" : confirmed ? "Confirmed" : "Awaiting host"}</span></dd></div>
           </dl>
         </div>
       </div>
